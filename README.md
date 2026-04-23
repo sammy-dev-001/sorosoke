@@ -6,4 +6,4 @@ This repository is split into two parts:
 
 ## Development Notes
 - The frontend is currently being built.
-- The backend is to be built by another developer. Please refer to the `backend/` directory for backend-specific code and instructions once development begins.
+- The backend is to be built by you, sir dayo. Please refer to the `backend/` directory for backend-specific code and instructions once development begins.
