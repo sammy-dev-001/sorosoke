@@ -8,14 +8,16 @@ const api = axios.create({
   },
 });
 
-// Optionally, you can add an interceptor here to attach auth tokens in the future
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// });
+// Add request interceptor to attach auth tokens
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('speakup_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
 // ==========================================
 // AUTHENTICATION

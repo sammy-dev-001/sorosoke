@@ -3,8 +3,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AuthCard from '../components/AuthCard';
 import StandardInput from '../components/forms/StandardInput';
-import { ShieldCheck, Users, Eye, EyeOff } from 'lucide-react';
-import { register } from '../services/api';
+import { ShieldCheck, Users, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
   const [fullName, setFullName] = useState('');
@@ -14,20 +14,25 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { registerUser } = useAuth();
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleRegister = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+    
     if (!termsAccepted) {
-      alert("Please accept the Safety Policy and Privacy Terms.");
+      setErrorMsg("Please accept the Safety Policy and Privacy Terms.");
       return;
     }
     
     setIsLoading(true);
     try {
-      const response = await register({ name: fullName, email, password });
-      console.log("Registration successful:", response);
-      // Automatically navigate to login or dashboard
+      await registerUser({ name: fullName, email, password });
+      onNavigateHome();
     } catch (error) {
       console.error("Registration failed:", error);
+      setErrorMsg(error.response?.data?.message || error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +81,13 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
           </div>
 
           <form onSubmit={handleRegister} className="flex flex-col gap-5 w-full flex-grow">
+            {errorMsg && (
+              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-start gap-2 border border-red-100 mb-1">
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <p className="font-medium leading-snug">{errorMsg}</p>
+              </div>
+            )}
+            
             <StandardInput 
               id="fullName"
               name="fullName"

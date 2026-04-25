@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ActionCard from './components/ActionCard';
@@ -86,7 +87,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#eaf3f9] via-white to-[#eaf3f9] font-sans selection:bg-teal-100">
+    <AuthProvider>
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#eaf3f9] via-white to-[#eaf3f9] font-sans selection:bg-teal-100">
       <Header onProfileClick={() => setCurrentView('login')} />
       
       <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-12 pb-24 w-full">
@@ -117,7 +119,8 @@ function App() {
       </main>
 
       <Footer />
-    </div>
+      </div>
+    </AuthProvider>
   );
 }
 

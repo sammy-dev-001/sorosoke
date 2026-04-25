@@ -3,23 +3,27 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AuthCard from '../components/AuthCard';
 import InputWithIcon from '../components/forms/InputWithIcon';
-import { Mail, Lock, LogIn, ShieldCheck, Info } from 'lucide-react';
-import { login } from '../services/api';
+import { Mail, Lock, LogIn, ShieldCheck, Info, AlertCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Login = ({ onNavigateHome, onNavigateSignUp }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const { loginUser } = useAuth();
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMsg('');
     try {
-      const response = await login({ email, password });
-      console.log("Login successful:", response);
-      // Navigate to dashboard or next view
+      await loginUser({ email, password });
+      onNavigateHome();
     } catch (error) {
       console.error("Login failed:", error);
+      setErrorMsg(error.response?.data?.message || error.message || "Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +65,13 @@ const Login = ({ onNavigateHome, onNavigateSignUp }) => {
             <p className="text-[#64748b] text-[15px]">Please enter your details to access your account.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-6 w-full">
+          <form onSubmit={handleLogin} className="flex flex-col gap-6 w-full flex-grow">
+            {errorMsg && (
+              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-center gap-2 border border-red-100">
+                <AlertCircle size={18} className="shrink-0" />
+                <p className="font-medium">{errorMsg}</p>
+              </div>
+            )}
             <InputWithIcon 
               id="email"
               name="email"
