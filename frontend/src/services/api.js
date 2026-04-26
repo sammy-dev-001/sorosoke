@@ -51,9 +51,17 @@ export const createCase = async (caseData) => {
   return response.data;
 };
 
-// GET /api/cases
-export const getCases = async () => {
-  const response = await api.get('/cases');
+// GET /api/cases?category=...&keyword=...&location=...
+export const getCases = async (filters = {}) => {
+  const { category, keyword, location } = filters;
+  
+  // Construct params object, removing empty values
+  const params = {};
+  if (category && category !== 'All Categories') params.category = category;
+  if (keyword) params.keyword = keyword;
+  if (location && location !== 'All Locations') params.location = location;
+
+  const response = await api.get('/cases', { params });
   return response.data;
 };
 
@@ -83,15 +91,28 @@ export const getComplaintsByCase = async (caseId) => {
 // NGOs
 // ==========================================
 
-// GET /api/ngos
-export const getNGOs = async () => {
-  const response = await api.get('/ngos');
+// GET /api/ngos?category=...
+export const getNGOs = async (category) => {
+  const params = {};
+  if (category && category !== 'All Categories') params.category = category;
+  
+  const response = await api.get('/ngos', { params });
   return response.data;
 };
 
-// GET /api/ngos?category=:category
-export const getNGOsByCategory = async (category) => {
-  const response = await api.get('/ngos', { params: { category } });
+// ==========================================
+// DOCUMENTS (NEW)
+// ==========================================
+
+// POST /api/documents/:caseId/generate
+export const generateDocument = async (caseId) => {
+  const response = await api.post(`/documents/${caseId}/generate`);
+  return response.data;
+};
+
+// GET /api/documents/:caseId
+export const getCaseDocuments = async (caseId) => {
+  const response = await api.get(`/documents/${caseId}`);
   return response.data;
 };
 

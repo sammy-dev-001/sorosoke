@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ReportProvider } from './context/ReportContext';
 import Header from './components/Header';
@@ -13,107 +13,156 @@ import ReportStep4 from './pages/ReportStep4';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import ReportSuccess from './pages/ReportSuccess';
+import CasesExplorer from './pages/CasesExplorer';
+import CaseDetails from './pages/CaseDetails';
+import AddExperience from './pages/AddExperience';
+import AddExperienceSuccess from './pages/AddExperienceSuccess';
+
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthPage = 
+    location.pathname === '/login' || 
+    location.pathname === '/signup' || 
+    location.pathname.includes('/add-experience') ||
+    location.pathname.endsWith('/success');
+
+  // Helper to determine active view for the Header
+  const getActiveView = (path) => {
+    if (path.startsWith('/cases')) return 'cases';
+    if (path === '/') return 'dashboard';
+    return '';
+  };
+
+  const content = (
+    <Routes>
+      <Route path="/" element={
+        <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-12 pb-24 w-full">
+          <Hero />
+          <div className="mt-14 w-full max-w-[56rem] grid grid-cols-1 md:grid-cols-2 gap-6 z-10">
+            <ActionCard
+              title="Report an Incident"
+              description="Securely share your experience. Our encrypted system ensures your report reaches the right hands without compromise."
+              icon="megaphone"
+              iconBg="bg-[#fad4d2]"
+              iconColor="text-[#e85d5d]"
+              linkText="Report Now"
+              onClick={() => navigate('/report')}
+            />
+            <ActionCard
+              title="View Cases"
+              description="See similar experiences shared by others. You are not alone."
+              icon="users"
+              iconBg="bg-slate-100"
+              iconColor="text-[#335368]"
+              linkText="View Cases"
+              onClick={() => navigate('/cases')}
+            />
+          </div>
+          <TrustBanner />
+        </main>
+      } />
+
+      <Route path="/login" element={
+        <Login 
+          onNavigateHome={() => navigate('/')} 
+          onNavigateSignUp={() => navigate('/signup')}
+        />
+      } />
+
+      <Route path="/signup" element={
+        <SignUp 
+          onNavigateHome={() => navigate('/')} 
+          onNavigateLogin={() => navigate('/login')}
+        />
+      } />
+
+      <Route path="/report" element={
+        <StartReport 
+          onNavigateHome={() => navigate('/')} 
+          onStartReport={() => navigate('/report/step-2')}
+        />
+      } />
+
+      <Route path="/report/step-2" element={
+        <ReportStep2 
+          onNavigateHome={() => navigate('/')}
+          onBack={() => navigate('/report')}
+          onContinue={() => navigate('/report/step-3')}
+        />
+      } />
+
+      <Route path="/report/step-3" element={
+        <ReportStep3 
+          onNavigateHome={() => navigate('/')}
+          onBack={() => navigate('/report/step-2')}
+          onNext={() => navigate('/report/step-4')}
+        />
+      } />
+
+      <Route path="/report/step-4" element={
+        <ReportStep4 
+          onNavigateHome={() => navigate('/')}
+          onBack={() => navigate('/report/step-3')}
+          onSuccess={() => navigate('/report/success')}
+        />
+      } />
+
+      <Route path="/report/success" element={
+        <ReportSuccess 
+          onGoToDashboard={() => navigate('/')}
+          onViewCases={() => navigate('/cases')}
+        />
+      } />
+
+      <Route path="/cases" element={
+        <CasesExplorer 
+          onReportNewCase={() => navigate('/report')}
+        />
+      } />
+
+      <Route path="/cases/:id" element={
+        <CaseDetails 
+          onReportIncident={() => navigate('/report')}
+        />
+      } />
+
+      <Route path="/cases/:id/add-experience" element={
+        <AddExperience />
+      } />
+
+      <Route path="/cases/:id/success" element={
+        <AddExperienceSuccess />
+      } />
+    </Routes>
+  );
+
+  if (isAuthPage) {
+    return content;
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#eaf3f9] via-white to-[#eaf3f9] font-sans selection:bg-teal-100">
+      <Header 
+        onProfileClick={() => navigate('/login')} 
+        onHomeClick={() => navigate('/')} 
+        onCasesClick={() => navigate('/cases')}
+        onDashboardClick={() => navigate('/')}
+        activeView={getActiveView(location.pathname)}
+      />
+      {content}
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
-  const [currentView, setCurrentView] = useState('home');
-
-  // Placeholder routing/API logic for the backend developer
-  const handleReportClick = () => {
-    setCurrentView('report');
-  };
-
-  const handleResourcesClick = () => {
-    // TODO: Wire up to the resources directory or API
-    console.log("Navigating to resources page...");
-  };
-
   return (
     <AuthProvider>
       <ReportProvider>
-        {currentView === 'login' ? (
-          <Login 
-            onNavigateHome={() => setCurrentView('home')} 
-            onNavigateSignUp={() => setCurrentView('signup')}
-          />
-        ) : currentView === 'signup' ? (
-          <SignUp 
-            onNavigateHome={() => setCurrentView('home')} 
-            onNavigateLogin={() => setCurrentView('login')}
-          />
-        ) : (
-          <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#eaf3f9] via-white to-[#eaf3f9] font-sans selection:bg-teal-100">
-            <Header onProfileClick={() => setCurrentView('login')} onHomeClick={() => setCurrentView('home')} />
-            
-            {currentView === 'home' && (
-              <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-12 pb-24 w-full">
-                <Hero />
-                
-                <div className="mt-14 w-full max-w-[56rem] grid grid-cols-1 md:grid-cols-2 gap-6 z-10">
-                  <ActionCard
-                    title="Report an Incident"
-                    description="Securely share your experience. Our encrypted system ensures your report reaches the right hands without compromise."
-                    icon="megaphone"
-                    iconBg="bg-[#fad4d2]"
-                    iconColor="text-[#e85d5d]"
-                    linkText="Report Now"
-                    onClick={handleReportClick}
-                  />
-                  <ActionCard
-                    title="Find Help"
-                    description="Browse verified resources, counseling services, and legal aid. Find immediate support in your community."
-                    icon="hand-heart"
-                    iconBg="bg-[#cae8e4]"
-                    iconColor="text-[#47988d]"
-                    linkText="Browse Resources"
-                    onClick={handleResourcesClick}
-                  />
-                </div>
-
-                <TrustBanner />
-              </main>
-            )}
-
-            {currentView === 'report' && (
-              <StartReport 
-                onNavigateHome={() => setCurrentView('home')} 
-                onStartReport={() => setCurrentView('report-step-2')}
-              />
-            )}
-
-            {currentView === 'report-step-2' && (
-              <ReportStep2 
-                onNavigateHome={() => setCurrentView('home')}
-                onBack={() => setCurrentView('report')}
-                onContinue={() => setCurrentView('report-step-3')}
-              />
-            )}
-
-            {currentView === 'report-step-3' && (
-              <ReportStep3 
-                onNavigateHome={() => setCurrentView('home')}
-                onBack={() => setCurrentView('report-step-2')}
-                onNext={() => setCurrentView('report-step-4')}
-              />
-            )}
-
-            {currentView === 'report-step-4' && (
-              <ReportStep4 
-                onNavigateHome={() => setCurrentView('home')}
-                onBack={() => setCurrentView('report-step-3')}
-                onSuccess={() => setCurrentView('report-success')}
-              />
-            )}
-
-            {currentView === 'report-success' && (
-              <ReportSuccess 
-                onGoToDashboard={() => setCurrentView('home')}
-                onViewCases={() => setCurrentView('home')} // TODO: Map to cases view when ready
-              />
-            )}
-
-            <Footer />
-          </div>
-        )}
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
       </ReportProvider>
     </AuthProvider>
   );

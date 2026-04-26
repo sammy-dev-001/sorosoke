@@ -1,4 +1,4 @@
-import { Megaphone, HandHeart, ArrowRight } from 'lucide-react';
+import { Megaphone, HandHeart, ArrowRight, Users } from 'lucide-react';
 
 export default function ActionCard({ 
   title, 
@@ -9,7 +9,7 @@ export default function ActionCard({
   linkText, 
   onClick 
 }) {
-  const IconComponent = icon === 'megaphone' ? Megaphone : HandHeart;
+  const IconComponent = icon === 'megaphone' ? Megaphone : icon === 'users' ? Users : HandHeart;
 
   return (
     <div 

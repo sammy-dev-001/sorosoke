@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { FileUp } from 'lucide-react';
 
-const DragDropZone = ({ onFilesDrop }) => {
+const DragDropZone = ({ onFilesDrop, title, subtitle, icon: Icon = FileUp, accept }) => {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -37,7 +37,7 @@ const DragDropZone = ({ onFilesDrop }) => {
   return (
     <div 
       className={`
-        border-dashed border-[2px] rounded-2xl py-14 px-6 flex flex-col items-center text-center cursor-pointer transition-colors
+        border-dashed border-[2px] rounded-2xl py-10 px-6 flex flex-col items-center text-center cursor-pointer transition-colors
         ${isDragging ? 'border-[#335368] bg-[#f0f7ff]' : 'border-slate-300 hover:border-slate-400 bg-transparent'}
       `}
       onClick={handleClick}
@@ -51,17 +51,19 @@ const DragDropZone = ({ onFilesDrop }) => {
         onChange={handleFileChange}
         className="hidden"
         multiple
-        accept=".pdf,.docx,.zip"
+        accept={accept}
       />
-      <div className="text-[#64748b] mb-4">
-        <FileUp size={28} strokeWidth={2} />
+      <div className="text-slate-800 mb-4 bg-slate-100 w-12 h-12 rounded-xl flex items-center justify-center">
+        <Icon size={24} strokeWidth={2.5} />
       </div>
-      <h3 className="text-[16px] font-medium text-[#334155] mb-1.5">
-        Drag and drop any other supporting documents here
+      <h3 className="text-[15px] font-medium text-slate-600 mb-1">
+        {title || "Click to upload or drag documents, photos, or recordings"}
       </h3>
-      <p className="text-[13px] text-slate-500">
-        PDF, DOCX, or ZIP files accepted
-      </p>
+      {subtitle && (
+        <p className="text-[13px] text-slate-400">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 };

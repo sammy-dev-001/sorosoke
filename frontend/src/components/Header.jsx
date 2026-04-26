@@ -1,6 +1,6 @@
 import { Bell, ArrowLeft } from 'lucide-react';
 
-export default function Header({ onHomeClick, onBackClick, onProfileClick }) {
+export default function Header({ onHomeClick, onBackClick, onProfileClick, onDashboardClick, onCasesClick, activeView }) {
   return (
     <header className="w-full h-16 px-6 sm:px-10 flex items-center justify-between z-20 bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0">
       {/* Left Side: Brand */}
@@ -25,12 +25,27 @@ export default function Header({ onHomeClick, onBackClick, onProfileClick }) {
 
       {/* Center Area: Navigation */}
       <nav className="hidden md:flex items-center gap-8">
-        <button className="text-[15px] font-normal text-slate-400 hover:text-slate-600 transition-colors">
+        <button 
+          onClick={onDashboardClick}
+          className={`text-[15px] transition-colors relative h-full flex items-center ${
+            activeView === 'dashboard' ? 'font-semibold text-slate-900' : 'font-normal text-slate-400 hover:text-slate-600'
+          }`}
+        >
           Dashboard
+          {activeView === 'dashboard' && (
+            <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-slate-900 rounded-full"></span>
+          )}
         </button>
-        <button className="text-[15px] font-semibold text-slate-900 relative">
+        <button 
+          onClick={onCasesClick}
+          className={`text-[15px] transition-colors relative h-full flex items-center ${
+            activeView === 'cases' ? 'font-semibold text-slate-900' : 'font-normal text-slate-400 hover:text-slate-600'
+          }`}
+        >
           Cases
-          <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-slate-900 rounded-full"></span>
+          {activeView === 'cases' && (
+            <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-slate-900 rounded-full"></span>
+          )}
         </button>
       </nav>
 
