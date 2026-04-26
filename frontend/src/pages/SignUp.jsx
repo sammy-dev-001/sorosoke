@@ -28,7 +28,7 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
     
     setIsLoading(true);
     try {
-      await registerUser({ name: fullName, email, password });
+      await registerUser({ fullName, email, password });
       onNavigateHome();
     } catch (error) {
       console.error("Registration failed:", error);

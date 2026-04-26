@@ -8,13 +8,15 @@ import SelectField from '../components/forms/SelectField';
 import InputWithIcon from '../components/forms/InputWithIcon';
 import PrivacyAlert from '../components/PrivacyAlert';
 import { Shield, Headset, MapPin, CalendarDays } from 'lucide-react';
+import { useReport } from '../context/ReportContext';
 
 const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
+  const { reportData, updateReportData } = useReport();
   const [formData, setFormData] = useState({
-    description: '',
-    category: '',
-    date: '',
-    location: ''
+    description: reportData.description || '',
+    category: reportData.category || '',
+    date: reportData.date || '',
+    location: reportData.location || ''
   });
 
   const handleChange = (e) => {
@@ -26,15 +28,13 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
   };
 
   const handleContinue = () => {
-    // Pass form data back to parent or state manager
-    onContinue(formData);
+    updateReportData(formData);
+    if (onContinue) onContinue();
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc] font-sans selection:bg-teal-100">
-      <Header onHomeClick={onNavigateHome} onBackClick={onBack} />
-      
-      <main className="flex-grow flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-10 pb-24 w-full">
+    <main className="flex-grow flex flex-col w-full">
+      <div className="flex-grow flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-10 pb-12">
         <div className="w-full max-w-3xl mt-4">
           <ProgressBar 
             currentStep={2} 
@@ -96,21 +96,6 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
             </div>
 
             <PrivacyAlert />
-
-            <div className="flex items-center justify-between pt-2">
-              <button 
-                onClick={onBack}
-                className="text-[#335368] hover:text-[#284355] font-medium px-4 py-2 transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button 
-                onClick={handleContinue}
-                className="bg-[#335368] hover:bg-[#284355] text-white px-8 py-3.5 rounded-xl font-medium transition-colors duration-200"
-              >
-                Continue
-              </button>
-            </div>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -128,10 +113,30 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
             />
           </div>
         </div>
-      </main>
+      </div>
 
-      <Footer />
-    </div>
+      {/* Action Bar - FULL WIDTH */}
+      <div className="w-full border-t border-slate-200 bg-white/50 backdrop-blur-sm py-6 mt-auto">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+          <div /> {/* Spacer to push buttons to the right if needed, but here we want back/continue spread out? Or grouped? Image showed Skip on left, Back/Submit on right. */}
+          
+          <div className="flex items-center gap-4 ml-auto">
+            <button 
+              onClick={onBack}
+              className="text-[#335368] hover:text-[#284355] font-medium px-6 py-2.5 transition-colors duration-200"
+            >
+              Back
+            </button>
+            <button 
+              onClick={handleContinue}
+              className="bg-[#335368] hover:bg-[#284355] text-white px-10 py-3.5 rounded-full font-medium transition-colors duration-200 shadow-md"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 };
 

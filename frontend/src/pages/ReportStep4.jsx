@@ -5,25 +5,31 @@ import ProgressBar from '../components/ProgressBar';
 import FileUploadCard from '../components/FileUploadCard';
 import DragDropZone from '../components/DragDropZone';
 import PrivacyAlert from '../components/PrivacyAlert';
-import { Image as ImageIcon, Mic, ShieldCheck, History, EyeOff } from 'lucide-react';
+import { Image as ImageIcon, Mic, ShieldCheck, History, EyeOff, AlertCircle } from 'lucide-react';
+import { useReport } from '../context/ReportContext';
 
-const ReportStep4 = ({ onNavigateHome, onBack }) => {
-  const [files, setFiles] = useState([]);
+const ReportStep4 = ({ onNavigateHome, onBack, onSuccess }) => {
+  const { reportData, updateReportData, submitReport, isLoading, error, success } = useReport();
 
   const handleFileSelect = (newFiles) => {
-    setFiles((prev) => [...prev, ...newFiles]);
+    updateReportData({ files: [...reportData.files, ...newFiles] });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Ready to send FormData to API", files);
+    await submitReport();
   };
+
+  // Handle successful submission redirect
+  React.useEffect(() => {
+    if (success) {
+      if (onSuccess) onSuccess();
+    }
+  }, [success, onSuccess]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc] font-sans">
-      <Header onHomeClick={onNavigateHome} />
-      
-      <main className="flex-grow flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-10 w-full">
+    <main className="flex-grow flex flex-col w-full">
+      <div className="flex-grow flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-10">
         <div className="w-full max-w-4xl mt-4">
           <ProgressBar 
             currentStep={4} 
@@ -46,6 +52,13 @@ const ReportStep4 = ({ onNavigateHome, onBack }) => {
             icon={ShieldCheck}
             iconStyle="outline"
           />
+
+          {error && (
+            <div className="mt-8 bg-red-50 text-red-600 p-4 rounded-2xl flex items-center gap-3 border border-red-100">
+              <AlertCircle size={20} className="shrink-0" />
+              <p className="font-medium text-[14px]">{error}</p>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-10">
             <FileUploadCard
@@ -82,11 +95,11 @@ const ReportStep4 = ({ onNavigateHome, onBack }) => {
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
-      {/* Action Bar */}
-      <div className="w-full border-t border-slate-200 bg-white py-5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Action Bar - FULL WIDTH */}
+      <div className="w-full border-t border-slate-200 bg-white/50 backdrop-blur-sm py-6 mt-auto">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           <button 
             type="button"
             className="text-[#64748b] hover:text-[#334155] font-medium text-[15px] transition-colors"
@@ -98,23 +111,26 @@ const ReportStep4 = ({ onNavigateHome, onBack }) => {
             <button 
               onClick={onBack}
               type="button"
-              className="bg-white border border-[#cbd5e1] text-[#335368] font-medium py-2.5 px-8 rounded-full hover:bg-slate-50 transition-colors"
+              className="bg-white border border-[#cbd5e1] text-[#335368] font-medium py-2.5 px-8 rounded-full hover:bg-slate-50 transition-colors shadow-sm"
             >
               Back
             </button>
             <button 
               onClick={handleSubmit}
+              disabled={isLoading}
               type="button"
-              className="bg-[#335368] hover:bg-[#2c485a] text-white font-medium py-2.5 px-8 rounded-full transition-colors shadow-sm"
+              className="bg-[#335368] hover:bg-[#2c485a] disabled:opacity-70 disabled:cursor-not-allowed text-white font-medium py-2.5 px-8 rounded-full transition-colors shadow-md flex items-center justify-center min-w-[160px]"
             >
-              Submit Report
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                "Submit Report"
+              )}
             </button>
           </div>
         </div>
       </div>
-
-      <Footer />
-    </div>
+    </main>
   );
 };
 
