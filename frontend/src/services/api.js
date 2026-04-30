@@ -96,7 +96,7 @@ export const getNGOs = async (category) => {
   const params = {};
   if (category && category !== 'All Categories') params.category = category;
   
-  const response = await api.get('/ngos', { params });
+  const response = await api.get('  ', { params });
   return response.data;
 };
 

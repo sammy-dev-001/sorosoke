@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import CaseFilterBar from '../components/cases/CaseFilterBar';
 import PublicCaseCard from '../components/cases/PublicCaseCard';
 import ShareStoryCard from '../components/cases/ShareStoryCard';
@@ -116,14 +116,7 @@ const CasesExplorer = ({ onReportNewCase }) => {
 
       </div>
 
-      {/* Floating Action Button (FAB) */}
-      <button 
-        onClick={onReportNewCase}
-        className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-[#335368] hover:bg-[#2c485a] text-white flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 z-50 group"
-        aria-label="Report New Case"
-      >
-        <Plus size={30} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
-      </button>
+
     </main>
   );
 };

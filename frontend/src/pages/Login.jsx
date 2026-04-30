@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AuthCard from '../components/AuthCard';
@@ -7,6 +8,7 @@ import { Mail, Lock, LogIn, ShieldCheck, Info, AlertCircle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext';
 
 const Login = ({ onNavigateHome, onNavigateSignUp }) => {
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +22,7 @@ const Login = ({ onNavigateHome, onNavigateSignUp }) => {
     setErrorMsg('');
     try {
       await loginUser({ email, password });
-      onNavigateHome();
+      onNavigateHome(location.state?.from);
     } catch (error) {
       console.error("Login failed:", error);
       setErrorMsg(error.response?.data?.message || error.message || "Invalid email or password. Please try again.");
@@ -56,7 +58,7 @@ const Login = ({ onNavigateHome, onNavigateSignUp }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#f8fafc] via-[#f1f6f9] to-[#f8fafc] font-sans">
-      <Header onHomeClick={onNavigateHome} />
+      <Header onHomeClick={onNavigateHome} onSignUpClick={onNavigateSignUp} />
       
       <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-10 w-full">
         <AuthCard leftContent={LeftContent}>

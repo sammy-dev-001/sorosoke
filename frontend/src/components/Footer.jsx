@@ -30,7 +30,7 @@ export default function Footer({ variant = "default" }) {
       <div className="w-full max-w-none px-6 sm:px-10 py-8 flex flex-col md:flex-row items-center md:items-start justify-between text-[0.825rem] text-[#6b7f94]">
         <div className="mb-6 md:mb-0 text-center md:text-left">
           <p className="font-bold text-[#142333] text-[0.875rem] mb-1.5 tracking-tight">SpeakUp (Sọrọsókè)</p>
-          <p>© 2024 SpeakUp (Sọrọsókè). A safe space for impact.</p>
+          <p>© 2026 SpeakUp (Sọrọsókè). A safe space for impact.</p>
         </div>
         
         <nav className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">

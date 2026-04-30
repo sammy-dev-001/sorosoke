@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ReportProvider } from './context/ReportContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -21,6 +21,15 @@ import AddExperienceSuccess from './pages/AddExperienceSuccess';
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+
+  const handleStartReport = () => {
+    if (user) {
+      navigate('/report');
+    } else {
+      navigate('/login', { state: { from: '/report' } });
+    }
+  };
   const isAuthPage = 
     location.pathname === '/login' || 
     location.pathname === '/signup' || 
@@ -46,8 +55,8 @@ function AppContent() {
               icon="megaphone"
               iconBg="bg-[#fad4d2]"
               iconColor="text-[#e85d5d]"
-              linkText="Report Now"
-              onClick={() => navigate('/report')}
+               linkText="Report Now"
+              onClick={handleStartReport}
             />
             <ActionCard
               title="View Cases"
@@ -65,7 +74,7 @@ function AppContent() {
 
       <Route path="/login" element={
         <Login 
-          onNavigateHome={() => navigate('/')} 
+          onNavigateHome={(path) => navigate(path || '/')} 
           onNavigateSignUp={() => navigate('/signup')}
         />
       } />
@@ -117,13 +126,13 @@ function AppContent() {
 
       <Route path="/cases" element={
         <CasesExplorer 
-          onReportNewCase={() => navigate('/report')}
+          onReportNewCase={handleStartReport}
         />
       } />
 
       <Route path="/cases/:id" element={
         <CaseDetails 
-          onReportIncident={() => navigate('/report')}
+          onReportIncident={handleStartReport}
         />
       } />
 
@@ -148,6 +157,8 @@ function AppContent() {
         onHomeClick={() => navigate('/')} 
         onCasesClick={() => navigate('/cases')}
         onDashboardClick={() => navigate('/')}
+        onLoginClick={() => navigate('/login')}
+        onSignUpClick={() => navigate('/signup')}
         activeView={getActiveView(location.pathname)}
       />
       {content}

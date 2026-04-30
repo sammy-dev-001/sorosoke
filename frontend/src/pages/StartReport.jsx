@@ -32,17 +32,7 @@ const StartReport = ({ onNavigateHome, onStartReport }) => {
           stepLabel="Getting Started" 
         />
         
-        <div className="flex items-center gap-3 mb-6 bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
-          <input 
-            type="checkbox" 
-            id="isUrgent" 
-            className="w-5 h-5 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
-            onChange={(e) => updateReportData({ isUrgent: e.target.checked })}
-          />
-          <label htmlFor="isUrgent" className="text-amber-900 font-medium text-[15px]">
-            This is an urgent report requiring immediate attention
-          </label>
-        </div>
+     
 
         <StartReportCard 
           onStartReport={handleStartReport}

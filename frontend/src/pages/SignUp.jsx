@@ -68,7 +68,7 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#f8fafc] via-[#f1f6f9] to-[#f8fafc] font-sans">
-      <Header onHomeClick={onNavigateHome} />
+      <Header onHomeClick={onNavigateHome} onLoginClick={onNavigateLogin} />
       
       <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-10 w-full">
         <AuthCard 
