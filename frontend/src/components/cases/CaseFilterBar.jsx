@@ -10,13 +10,14 @@ const CaseFilterBar = ({
   setSelectedLocation 
 }) => {
   const categories = [
-    "All Categories",
-    "Police Brutality",
-    "Sexual Harassment",
-    "Corruption",
-    "Workplace Abuse",
-    "LASTMA Extortion",
-    "Landlord Dispute"
+    { value: 'All Categories', label: 'All Categories' },
+    { value: 'police_brutality', label: 'Police Brutality' },
+    { value: 'sexual_harassment', label: 'Sexual Harassment' },
+    { value: 'lastma_extortion', label: 'LASTMA Extortion' },
+    { value: 'landlord_dispute', label: 'Landlord Dispute' },
+    { value: 'corruption', label: 'Corruption' },
+    { value: 'workplace_abuse', label: 'Workplace Abuse' },
+    { value: 'other', label: 'Other' }
   ];
 
   const locations = [
@@ -53,7 +54,7 @@ const CaseFilterBar = ({
               className="w-full appearance-none bg-white border border-slate-200 rounded-2xl py-4 pl-6 pr-12 text-[15px] focus:outline-none focus:ring-2 focus:ring-slate-200 transition-all text-slate-700 font-medium cursor-pointer"
             >
               {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Send, UploadCloud } from 'lucide-react';
+import { X, Send, UploadCloud, Mic, FileText } from 'lucide-react';
 import SelectionCard from '../components/SelectionCard';
 import DragDropZone from '../components/DragDropZone';
 import PrivacyAlert from '../components/PrivacyAlert';
@@ -24,6 +24,64 @@ const AddExperience = () => {
       ...prev,
       files: [...prev.files, ...newFiles]
     }));
+  };
+
+  const removeFile = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      files: prev.files.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
+  const renderFilePreview = (file, index) => {
+    const isImage = file.type?.startsWith('image/');
+    const isAudio = file.type?.startsWith('audio/');
+    const fileUrl = file instanceof File ? URL.createObjectURL(file) : (file.url || file);
+
+    return (
+      <div key={index} className="flex items-start justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+        <div className="flex flex-col gap-2 w-full overflow-hidden mr-2">
+          <div className="flex items-center gap-3">
+            {isImage ? (
+              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-100 border border-slate-200">
+                <img src={fileUrl} alt={file.name || 'Image'} className="w-full h-full object-cover" />
+              </div>
+            ) : isAudio ? (
+              <div className="w-10 h-10 rounded-lg shrink-0 bg-indigo-50 text-indigo-500 flex items-center justify-center border border-indigo-100">
+                <Mic size={20} />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-lg shrink-0 bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200">
+                <FileText size={20} />
+              </div>
+            )}
+            
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[14px] font-medium text-slate-700 truncate">{file.name || `File ${index + 1}`}</span>
+              {file.size && <span className="text-[12px] text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</span>}
+            </div>
+          </div>
+          
+          {isImage && (
+             <div className="mt-2 w-full rounded-lg overflow-hidden bg-slate-100 border border-slate-200 max-h-[200px] flex items-center justify-center">
+               <img src={fileUrl} alt={file.name || 'Preview'} className="max-h-[200px] object-contain" />
+             </div>
+          )}
+          {isAudio && (
+             <audio controls src={fileUrl} className="h-10 mt-2 w-full max-w-[300px]" />
+          )}
+        </div>
+        
+        <button 
+          type="button" 
+          onClick={() => removeFile(index)}
+          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
+          aria-label="Remove file"
+        >
+          <X size={18} />
+        </button>
+      </div>
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -116,12 +174,11 @@ const AddExperience = () => {
                   title="Click to upload or drag documents, photos, or recordings"
                 />
                 {formData.files.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {formData.files.map((file, i) => (
-                      <div key={i} className="bg-slate-100 px-3 py-1.5 rounded-lg text-[13px] text-slate-600 border border-slate-200">
-                        {file.name}
-                      </div>
-                    ))}
+                  <div className="mt-6">
+                    <h3 className="text-[15px] font-medium text-slate-800 mb-3">Attached Files ({formData.files.length})</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {formData.files.map((file, i) => renderFilePreview(file, i))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -175,7 +232,7 @@ const AddExperience = () => {
       {/* Footer */}
       <footer className="py-10 text-center">
         <p className="text-[13px] text-slate-400">
-          © 2024 SpeakUp (Sọrọsókè) Community Empowerment Platform
+          © 2026 SpeakUp (Sọrọsókè) Community Empowerment Platform
         </p>
       </footer>
     </div>

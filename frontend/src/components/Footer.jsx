@@ -7,7 +7,7 @@ export default function Footer({ variant = "default" }) {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between">
           <div className="mb-4 md:mb-0 text-center md:text-left">
             <p className="font-medium text-[#335368] text-[0.875rem] mb-1 tracking-tight">SpeakUp (Sọrọsókè)</p>
-            <p>© 2024 SpeakUp (Sọrọsókè). A quiet companion for social progress.</p>
+            <p>© 2026 SpeakUp (Sọrọsókè). A quiet companion for social progress.</p>
           </div>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="flex items-center gap-1.5 text-[#3b5974] font-semibold tracking-wider text-[0.75rem]">

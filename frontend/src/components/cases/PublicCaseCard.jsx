@@ -8,14 +8,26 @@ const PublicCaseCard = ({ id, category, location, title, description, reportsCou
   // Dynamic styling for category badges
   const getCategoryStyles = (cat) => {
     const styles = {
-      'Workplace': 'bg-[#e2f2f1] text-[#47988d]',
-      'Civil Rights': 'bg-[#e3f2fd] text-[#1976d2]',
-      'Legal Aid': 'bg-[#f5f5f5] text-[#616161]',
-      'Institutional': 'bg-[#e0f2f1] text-[#00897b]',
-      'Education': 'bg-[#e3f2fd] text-[#1e88e5]',
+      'police_brutality': 'bg-[#fad4d2] text-[#e85d5d]',
+      'sexual_harassment': 'bg-[#f3e8ff] text-[#9333ea]',
+      'lastma_extortion': 'bg-[#fef3c7] text-[#d97706]',
+      'landlord_dispute': 'bg-[#dcfce7] text-[#16a34a]',
+      'corruption': 'bg-[#fee2e2] text-[#dc2626]',
+      'workplace_abuse': 'bg-[#e0f2fe] text-[#0284c7]',
+      'other': 'bg-slate-100 text-slate-600',
       'default': 'bg-slate-100 text-slate-600'
     };
     return styles[cat] || styles['default'];
+  };
+
+  const categoryLabels = {
+    'police_brutality': 'Police Brutality',
+    'sexual_harassment': 'Sexual Harassment',
+    'lastma_extortion': 'LASTMA Extortion',
+    'landlord_dispute': 'Landlord Dispute',
+    'corruption': 'Corruption',
+    'workplace_abuse': 'Workplace Abuse',
+    'other': 'Other'
   };
 
   return (
@@ -23,7 +35,7 @@ const PublicCaseCard = ({ id, category, location, title, description, reportsCou
       {/* Top Row */}
       <div className="flex justify-between items-center mb-6">
         <span className={`px-4 py-1.5 rounded-full text-[13px] font-semibold ${getCategoryStyles(category)}`}>
-          {category}
+          {categoryLabels[category] || category}
         </span>
         <div className="flex items-center gap-1.5 text-slate-400 text-[13px]">
           <MapPin size={14} />

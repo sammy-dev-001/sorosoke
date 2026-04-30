@@ -9,6 +9,7 @@ import InputWithIcon from '../components/forms/InputWithIcon';
 import PrivacyAlert from '../components/PrivacyAlert';
 import { Shield, Headset, MapPin, CalendarDays } from 'lucide-react';
 import { useReport } from '../context/ReportContext';
+import GooglePlacesInput from '../components/forms/GooglePlacesInput';
 
 const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
   const { reportData, updateReportData } = useReport();
@@ -68,9 +69,12 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
                   value={formData.category}
                   onChange={handleChange}
                   options={[
-                    { value: 'harassment', label: 'Harassment' },
-                    { value: 'discrimination', label: 'Discrimination' },
-                    { value: 'assault', label: 'Assault' },
+                    { value: 'police_brutality', label: 'Police Brutality' },
+                    { value: 'sexual_harassment', label: 'Sexual Harassment' },
+                    { value: 'lastma_extortion', label: 'LASTMA Extortion' },
+                    { value: 'landlord_dispute', label: 'Landlord Dispute' },
+                    { value: 'corruption', label: 'Corruption' },
+                    { value: 'workplace_abuse', label: 'Workplace Abuse' },
                     { value: 'other', label: 'Other' }
                   ]}
                 />
@@ -84,7 +88,7 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
                 />
               </div>
 
-              <InputWithIcon 
+              <GooglePlacesInput 
                 id="location"
                 name="location"
                 label="Where did it happen?"
@@ -92,6 +96,7 @@ const ReportStep2 = ({ onBack, onContinue, onNavigateHome }) => {
                 value={formData.location}
                 onChange={handleChange}
                 leftIcon={MapPin}
+                apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
               />
             </div>
 

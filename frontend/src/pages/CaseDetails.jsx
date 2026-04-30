@@ -52,6 +52,16 @@ const CaseDetails = () => {
     );
   }
 
+  const categoryLabels = {
+    'police_brutality': 'Police Brutality',
+    'sexual_harassment': 'Sexual Harassment',
+    'lastma_extortion': 'LASTMA Extortion',
+    'landlord_dispute': 'Landlord Dispute',
+    'corruption': 'Corruption',
+    'workplace_abuse': 'Workplace Abuse',
+    'other': 'Other'
+  };
+
   return (
     <main className="flex-grow flex flex-col items-center w-full bg-white">
       <div className="w-full max-w-7xl px-6 sm:px-10 py-12 mx-auto">
@@ -64,7 +74,7 @@ const CaseDetails = () => {
             {/* Meta Row */}
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <span className="bg-[#335368] text-white px-4 py-1.5 rounded-lg text-[13px] font-semibold">
-                {caseData.category}
+                {categoryLabels[caseData.category] || caseData.category}
               </span>
               <div className="flex items-center gap-1.5 text-slate-400 text-[14px]">
                 <MapPin size={16} />

@@ -45,9 +45,12 @@ export const ReportProvider = ({ children }) => {
       };
 
       const caseResponse = await createCase(caseData);
-      const caseId = caseResponse.id || caseResponse._id;
+      console.log("Case creation response:", caseResponse);
+      const caseId = caseResponse.id || caseResponse._id || (caseResponse.data && (caseResponse.data.id || caseResponse.data._id)) || caseResponse.caseId;
+      console.log("Extracted Case ID:", caseId);
 
       if (!caseId) {
+        console.error("Failed to retrieve explicit case ID from response. Response:", caseResponse);
         throw new Error("Failed to retrieve case ID from response");
       }
 
@@ -59,6 +62,12 @@ export const ReportProvider = ({ children }) => {
       
       reportData.files.forEach((file) => {
         formData.append('attachments', file);
+      });
+
+      console.log("Submitting complaint with FormData:", {
+        caseId,
+        content: reportData.description,
+        fileCount: reportData.files.length
       });
 
       await createComplaint(formData);

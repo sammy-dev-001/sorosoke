@@ -5,14 +5,71 @@ import ProgressBar from '../components/ProgressBar';
 import FileUploadCard from '../components/FileUploadCard';
 import DragDropZone from '../components/DragDropZone';
 import PrivacyAlert from '../components/PrivacyAlert';
-import { Image as ImageIcon, Mic, ShieldCheck, History, EyeOff, AlertCircle } from 'lucide-react';
+import { Image as ImageIcon, Mic, ShieldCheck, History, EyeOff, AlertCircle, X, FileText } from 'lucide-react';
 import { useReport } from '../context/ReportContext';
 
 const ReportStep4 = ({ onNavigateHome, onBack, onSuccess }) => {
   const { reportData, updateReportData, submitReport, isLoading, error, success } = useReport();
 
   const handleFileSelect = (newFiles) => {
-    updateReportData({ files: [...reportData.files, ...newFiles] });
+    updateReportData({ files: [...(reportData.files || []), ...newFiles] });
+  };
+
+  const removeFile = (indexToRemove) => {
+    updateReportData({
+      files: reportData.files.filter((_, index) => index !== indexToRemove)
+    });
+  };
+
+  const renderFilePreview = (file, index) => {
+    const isImage = file.type?.startsWith('image/');
+    const isAudio = file.type?.startsWith('audio/');
+    const fileUrl = file instanceof File ? URL.createObjectURL(file) : (file.url || file);
+
+    return (
+      <div key={index} className="flex items-start justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+        <div className="flex flex-col gap-2 w-full overflow-hidden mr-2">
+          <div className="flex items-center gap-3">
+            {isImage ? (
+              <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-100 border border-slate-200">
+                <img src={fileUrl} alt={file.name || 'Image'} className="w-full h-full object-cover" />
+              </div>
+            ) : isAudio ? (
+              <div className="w-10 h-10 rounded-lg shrink-0 bg-indigo-50 text-indigo-500 flex items-center justify-center border border-indigo-100">
+                <Mic size={20} />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-lg shrink-0 bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200">
+                <FileText size={20} />
+              </div>
+            )}
+            
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-[14px] font-medium text-slate-700 truncate">{file.name || `File ${index + 1}`}</span>
+              {file.size && <span className="text-[12px] text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</span>}
+            </div>
+          </div>
+          
+          {isImage && (
+             <div className="mt-2 w-full rounded-lg overflow-hidden bg-slate-100 border border-slate-200 max-h-[200px] flex items-center justify-center">
+               <img src={fileUrl} alt={file.name || 'Preview'} className="max-h-[200px] object-contain" />
+             </div>
+          )}
+          {isAudio && (
+             <audio controls src={fileUrl} className="h-10 mt-2 w-full max-w-[300px]" />
+          )}
+        </div>
+        
+        <button 
+          type="button" 
+          onClick={() => removeFile(index)}
+          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
+          aria-label="Remove file"
+        >
+          <X size={18} />
+        </button>
+      </div>
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -82,6 +139,15 @@ const ReportStep4 = ({ onNavigateHome, onBack, onSuccess }) => {
           <div className="mb-12">
             <DragDropZone onFilesDrop={handleFileSelect} />
           </div>
+
+          {reportData.files && reportData.files.length > 0 && (
+            <div className="mb-12">
+              <h3 className="text-[16px] font-semibold text-[#1e293b] mb-4">Attached Files ({reportData.files.length})</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {reportData.files.map((file, index) => renderFilePreview(file, index))}
+              </div>
+            </div>
+          )}
 
           {/* Security Features */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-16 border-t border-slate-200 pt-8">

@@ -68,12 +68,6 @@ const Login = ({ onNavigateHome, onNavigateSignUp }) => {
           </div>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-6 w-full flex-grow">
-            {errorMsg && (
-              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-center gap-2 border border-red-100">
-                <AlertCircle size={18} className="shrink-0" />
-                <p className="font-medium">{errorMsg}</p>
-              </div>
-            )}
             <InputWithIcon 
               id="email"
               name="email"
@@ -116,6 +110,13 @@ const Login = ({ onNavigateHome, onNavigateSignUp }) => {
               {isLoading ? "Logging in..." : "Log In"}
               {!isLoading && <LogIn size={18} strokeWidth={2} />}
             </button>
+
+            {errorMsg && (
+              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-center gap-2 border border-red-100 mt-2">
+                <AlertCircle size={18} className="shrink-0" />
+                <p className="font-medium">{errorMsg}</p>
+              </div>
+            )}
             
             <p className="text-center text-[14px] text-slate-600 mt-6">
               Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); onNavigateSignUp?.(); }} className="font-bold text-[#335368] hover:text-[#1e3443]">Create an account</a>

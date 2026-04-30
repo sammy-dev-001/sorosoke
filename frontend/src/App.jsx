@@ -17,6 +17,7 @@ import CasesExplorer from './pages/CasesExplorer';
 import CaseDetails from './pages/CaseDetails';
 import AddExperience from './pages/AddExperience';
 import AddExperienceSuccess from './pages/AddExperienceSuccess';
+import Profile from './pages/Profile';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function AppContent() {
     location.pathname === '/login' || 
     location.pathname === '/signup' || 
     location.pathname.includes('/add-experience') ||
+    location.pathname === '/profile' ||
     location.pathname.endsWith('/success');
 
   // Helper to determine active view for the Header
@@ -143,6 +145,10 @@ function AppContent() {
       <Route path="/cases/:id/success" element={
         <AddExperienceSuccess />
       } />
+
+      <Route path="/profile" element={
+        <Profile />
+      } />
     </Routes>
   );
 
@@ -153,7 +159,7 @@ function AppContent() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#eaf3f9] via-white to-[#eaf3f9] font-sans selection:bg-teal-100">
       <Header 
-        onProfileClick={() => navigate('/login')} 
+        onProfileClick={() => user ? navigate('/profile') : navigate('/login')} 
         onHomeClick={() => navigate('/')} 
         onCasesClick={() => navigate('/cases')}
         onDashboardClick={() => navigate('/')}

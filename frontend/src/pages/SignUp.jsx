@@ -81,13 +81,6 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
           </div>
 
           <form onSubmit={handleRegister} className="flex flex-col gap-5 w-full flex-grow">
-            {errorMsg && (
-              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-start gap-2 border border-red-100 mb-1">
-                <AlertCircle size={18} className="shrink-0 mt-0.5" />
-                <p className="font-medium leading-snug">{errorMsg}</p>
-              </div>
-            )}
-            
             <StandardInput 
               id="fullName"
               name="fullName"
@@ -139,6 +132,13 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
             >
               {isLoading ? "Signing up..." : "Sign Up"}
             </button>
+
+            {errorMsg && (
+              <div className="bg-red-50 text-red-600 p-3.5 rounded-xl text-[14px] flex items-start gap-2 border border-red-100 mt-2">
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <p className="font-medium leading-snug">{errorMsg}</p>
+              </div>
+            )}
             
             <p className="text-center text-[14px] text-slate-600 mt-4 mb-8">
               Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); onNavigateLogin?.(); }} className="font-medium text-[#335368] hover:text-[#1e3443] hover:underline">Log in</a>
@@ -148,7 +148,7 @@ const SignUp = ({ onNavigateHome, onNavigateLogin }) => {
           <div className="mt-auto">
             <hr className="border-slate-100 mb-5" />
             <p className="text-center text-[11px] font-medium text-slate-400">
-              © 2024 SpeakUp (Sọrọsókè). All rights reserved.
+              © 2026 SpeakUp (Sọrọsókè). All rights reserved.
             </p>
           </div>
         </AuthCard>
