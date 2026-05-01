@@ -1,35 +1,45 @@
 import React, { useEffect, useRef } from 'react';
 import { usePlacesWidget } from "react-google-autocomplete";
 
+// Sub-component that actually uses the Google Maps hook
+const AutocompleteInput = ({ apiKey, onPlaceSelected, options, inputProps, inputRef }) => {
+  const { ref } = usePlacesWidget({
+    apiKey,
+    onPlaceSelected,
+    options,
+  });
+
+  // We need to sync the ref from usePlacesWidget with the one passed from parent if needed,
+  // but usePlacesWidget provides its own ref. We'll use a local effect to sync values.
+  return (
+    <input
+      ref={ref}
+      {...inputProps}
+    />
+  );
+};
+
 const GooglePlacesInput = ({ label, placeholder, value, onChange, name, id, leftIcon: LeftIcon, apiKey }) => {
   // Check if API key is valid (not empty and not the placeholder)
   const isApiKeyValid = apiKey && apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY_HERE' && apiKey.trim() !== '';
 
-  const { ref: autocompleteRef } = usePlacesWidget({
-    apiKey: isApiKeyValid ? apiKey : undefined,
-    onPlaceSelected: (place) => {
-      onChange({
-        target: {
-          name: name,
-          value: place.formatted_address || place.name,
-        },
-      });
-    },
-    options: {
-      types: ["geocode", "establishment"],
-      componentRestrictions: { country: "ng" },
-    },
-  });
+  const handlePlaceSelected = (place) => {
+    onChange({
+      target: {
+        name: name,
+        value: place.formatted_address || place.name,
+      },
+    });
+  };
 
-  const fallbackRef = useRef(null);
-  const inputRef = isApiKeyValid ? autocompleteRef : fallbackRef;
+  const options = {
+    types: ["geocode", "establishment"],
+    componentRestrictions: { country: "ng" },
+  };
 
-  // Sync value for controlled input
-  useEffect(() => {
-    if (inputRef.current && value !== undefined) {
-      inputRef.current.value = value;
-    }
-  }, [value, inputRef]);
+  const inputStyles = `w-full bg-[#f2f6f9] border border-slate-200 rounded-xl p-3.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#335368]/20 focus:border-[#335368]/40 transition-all ${
+    LeftIcon ? 'pl-10' : ''
+  }`;
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -42,17 +52,32 @@ const GooglePlacesInput = ({ label, placeholder, value, onChange, name, id, left
             <LeftIcon size={18} strokeWidth={2.5} />
           </div>
         )}
-        <input
-          ref={inputRef}
-          type="text"
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          className={`w-full bg-[#f2f6f9] border border-slate-200 rounded-xl p-3.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#335368]/20 focus:border-[#335368]/40 transition-all ${
-            LeftIcon ? 'pl-10' : ''
-          }`}
-          onChange={onChange}
-        />
+        
+        {isApiKeyValid ? (
+          <AutocompleteInput
+            apiKey={apiKey}
+            onPlaceSelected={handlePlaceSelected}
+            options={options}
+            inputProps={{
+              id,
+              name,
+              placeholder,
+              className: inputStyles,
+              defaultValue: value,
+              onChange: onChange
+            }}
+          />
+        ) : (
+          <input
+            type="text"
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            value={value}
+            className={inputStyles}
+            onChange={onChange}
+          />
+        )}
       </div>
       {!isApiKeyValid && (
         <p className="text-[11px] text-slate-400 italic">

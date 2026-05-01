@@ -26,9 +26,9 @@ export const AuthProvider = ({ children }) => {
         }
         
         try {
-          // Assuming getMe returns the user profile
+          // assuming getMe returns the user profile
           const profile = await getMe();
-          const userData = profile.user || profile.data || profile;
+          const userData = profile.user || (profile.data && profile.data.user) || profile.data || profile;
           setUser(userData);
           localStorage.setItem('speakup_user', JSON.stringify(userData));
         } catch (error) {

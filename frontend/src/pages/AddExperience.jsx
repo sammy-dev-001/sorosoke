@@ -94,10 +94,9 @@ const AddExperience = () => {
       const submitData = new FormData();
       submitData.append('caseId', id);
       submitData.append('content', formData.story);
-      submitData.append('privacy', formData.privacy);
       
       formData.files.forEach((file) => {
-        submitData.append('attachments', file);
+        submitData.append('evidenceFiles', file);
       });
 
       await createComplaint(submitData);

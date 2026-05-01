@@ -41,12 +41,12 @@ export const ReportProvider = ({ children }) => {
         category: reportData.category,
         incidentDate: reportData.date,
         location: reportData.location,
-        identityType: reportData.identity
+        identityType: reportData.identity === 'identified' ? 'public' : reportData.identity
       };
 
       const caseResponse = await createCase(caseData);
       console.log("Case creation response:", caseResponse);
-      const caseId = caseResponse.id || caseResponse._id || (caseResponse.data && (caseResponse.data.id || caseResponse.data._id)) || caseResponse.caseId;
+      const caseId = caseResponse.id || caseResponse._id || (caseResponse.data && (caseResponse.data.id || caseResponse.data._id)) || caseResponse.caseId || (caseResponse.case && (caseResponse.case.id || caseResponse.case._id));
       console.log("Extracted Case ID:", caseId);
 
       if (!caseId) {
@@ -61,7 +61,7 @@ export const ReportProvider = ({ children }) => {
       formData.append('content', reportData.description);
       
       reportData.files.forEach((file) => {
-        formData.append('attachments', file);
+        formData.append('evidenceFiles', file);
       });
 
       console.log("Submitting complaint with FormData:", {

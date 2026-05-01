@@ -3,9 +3,6 @@ import axios from 'axios';
 // Create an Axios instance configured with the backend base URL
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'https://sorosoke-backend-production.up.railway.app/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Add request interceptor to attach auth tokens
