@@ -80,7 +80,9 @@ export const ReportProvider = ({ children }) => {
       await createComplaint(formData);
 
       setSuccess(true);
-      // Clear data on success
+// Save category for success page BEFORE clearing
+localStorage.setItem('lastReportedCategory', reportData.category);
+// Clear data on success
       setReportData({
         isUrgent: false,
         description: '',

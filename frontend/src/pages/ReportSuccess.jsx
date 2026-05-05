@@ -25,7 +25,7 @@ const ReportSuccess = ({ onGoToDashboard, onViewCases }) => {
         {/* Middle Section: Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
           <NextStepsCard />
-          <RightsCard />
+         <RightsCard category={localStorage.getItem('lastReportedCategory') || 'other'} />
         </div>
 
         {/* Bottom Section: Action Area */}
