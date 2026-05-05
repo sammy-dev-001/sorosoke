@@ -1,7 +1,7 @@
 import { Bell, ArrowLeft, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function Header({ onHomeClick, onBackClick, onProfileClick, onDashboardClick, onCasesClick, onLoginClick, onSignUpClick, activeView }) {
+export default function Header({ onHomeClick, onBackClick, onProfileClick, onDashboardClick, onCasesClick, onAboutClick, onLoginClick, onSignUpClick, activeView }) {
   const { user } = useAuth();
 
   return (
@@ -48,6 +48,17 @@ export default function Header({ onHomeClick, onBackClick, onProfileClick, onDas
           >
             Cases
             {activeView === 'cases' && (
+              <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-slate-900 rounded-full"></span>
+            )}
+          </button>
+          <button 
+            onClick={onAboutClick}
+            className={`text-[15px] transition-colors relative h-full flex items-center ${
+              activeView === 'about' ? 'font-semibold text-slate-900' : 'font-normal text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            About
+            {activeView === 'about' && (
               <span className="absolute -bottom-[21px] left-0 right-0 h-0.5 bg-slate-900 rounded-full"></span>
             )}
           </button>

@@ -36,7 +36,7 @@ const CasesExplorer = ({ onReportNewCase }) => {
           category: selectedCategory,
           location: selectedLocation
         });
-        setCases(data);
+        setCases(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch cases:", err);

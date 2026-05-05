@@ -18,6 +18,7 @@ import CaseDetails from './pages/CaseDetails';
 import AddExperience from './pages/AddExperience';
 import AddExperienceSuccess from './pages/AddExperienceSuccess';
 import Profile from './pages/Profile';
+import About from './pages/About';
 
 function AppContent() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ function AppContent() {
   const getActiveView = (path) => {
     if (path.startsWith('/cases')) return 'cases';
     if (path === '/') return 'dashboard';
+    if (path === '/about') return 'about';
     return '';
   };
 
@@ -72,6 +74,13 @@ function AppContent() {
           </div>
           <TrustBanner />
         </main>
+      } />
+
+      <Route path="/about" element={
+        <About 
+          onReportClick={handleStartReport} 
+          onExploreClick={() => navigate('/cases')} 
+        />
       } />
 
       <Route path="/login" element={
@@ -163,12 +172,13 @@ function AppContent() {
         onHomeClick={() => navigate('/')} 
         onCasesClick={() => navigate('/cases')}
         onDashboardClick={() => navigate('/')}
+        onAboutClick={() => navigate('/about')}
         onLoginClick={() => navigate('/login')}
         onSignUpClick={() => navigate('/signup')}
         activeView={getActiveView(location.pathname)}
       />
       {content}
-      <Footer />
+      <Footer onAboutClick={() => navigate('/about')} />
     </div>
   );
 }

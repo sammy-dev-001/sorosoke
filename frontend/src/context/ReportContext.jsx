@@ -33,10 +33,31 @@ export const ReportProvider = ({ children }) => {
     setIsLoading(true);
     setError(null);
     try {
+      // 1. Create the Case first (this makes it show up in the Cases Explorer)
+      const caseData = {
+        title: `Report: ${reportData.category.replace('_', ' ') || 'Incident'}`,
+        description: reportData.description,
+        category: reportData.category,
+        incidentDate: reportData.date,
+        location: reportData.location,
+        isAnonymous: reportData.identity === 'anonymous'
+      };
+
+      const caseResponse = await createCase(caseData);
+      const caseId = caseResponse.id || caseResponse._id || 
+                    (caseResponse.case && (caseResponse.case.id || caseResponse.case._id)) ||
+                    (caseResponse.data && (caseResponse.data.id || caseResponse.data._id || (caseResponse.data.case && (caseResponse.data.case.id || caseResponse.data.case._id))));
+
+      if (!caseId) {
+        throw new Error("Failed to retrieve case ID from response");
+      }
+
+      // 2. Add files/complaint to the newly created case
       // Use FormData for multipart/form-data support
       const formData = new FormData();
       
       // Map reportData to the structure specified by the user
+      formData.append('caseId', caseId);
       formData.append('description', reportData.description);
       formData.append('category', reportData.category);
       formData.append('incidentDate', reportData.date);
@@ -50,12 +71,9 @@ export const ReportProvider = ({ children }) => {
         });
       }
 
-      console.log("Submitting report with FormData:", {
+      console.log("Submitting complaint with FormData:", {
+        caseId,
         description: reportData.description,
-        category: reportData.category,
-        incidentDate: reportData.date,
-        location: reportData.location,
-        isAnonymous: reportData.identity === 'anonymous',
         fileCount: reportData.files.length
       });
 

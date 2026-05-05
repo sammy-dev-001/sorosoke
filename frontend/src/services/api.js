@@ -59,13 +59,15 @@ export const getCases = async (filters = {}) => {
   if (location && location !== 'All Locations') params.location = location;
 
   const response = await api.get('/cases', { params });
-  return response.data;
+  // Handle various backend response formats
+  return response.data.cases || response.data.data || response.data;
 };
 
 // GET /api/cases/:id
 export const getCaseById = async (id) => {
   const response = await api.get(`/cases/${id}`);
-  return response.data;
+  // Handle various backend response formats
+  return response.data.case || response.data.data || response.data;
 };
 
 // ==========================================
@@ -74,13 +76,8 @@ export const getCaseById = async (id) => {
 
 // POST /api/complaints
 export const createComplaint = async (data) => {
-  // If data is FormData (has files), set multipart headers so Axios includes the boundary.
-  // If no files, send plain JSON to avoid Multer crashing on an empty multipart body.
-  const isFormData = data instanceof FormData;
-  const config = isFormData
-    ? { headers: { 'Content-Type': 'multipart/form-data' } }
-    : {};
-  const response = await api.post('/complaints', data, config);
+  // Axios will automatically set the correct Content-Type with boundary if data is FormData
+  const response = await api.post('/complaints', data);
   return response.data;
 };
 

@@ -1,6 +1,6 @@
 import { ShieldCheck } from 'lucide-react';
 
-export default function Footer({ variant = "default" }) {
+export default function Footer({ variant = "default", onAboutClick }) {
   if (variant === "secure") {
     return (
       <footer className="w-full mt-auto z-20 px-6 sm:px-10 py-8 text-[0.825rem] text-[#6b7f94]">
@@ -15,9 +15,9 @@ export default function Footer({ variant = "default" }) {
               SECURE PORTAL
             </div>
             <nav className="flex items-center gap-4">
+              <a href="#" className="hover:text-[#335368] transition-colors" onClick={(e) => { e.preventDefault(); onAboutClick?.(); }}>About</a>
               <a href="#" className="hover:text-[#335368] transition-colors" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
               <a href="#" className="hover:text-[#335368] transition-colors" onClick={(e) => e.preventDefault()}>Terms of Service</a>
-              <a href="#" className="hover:text-[#335368] transition-colors" onClick={(e) => e.preventDefault()}>Safety Guide</a>
             </nav>
           </div>
         </div>
@@ -34,9 +34,9 @@ export default function Footer({ variant = "default" }) {
         </div>
         
         <nav className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
+          <a href="#" className="hover:text-[#142333] transition-colors duration-200" onClick={(e) => { e.preventDefault(); onAboutClick?.(); }}>About</a>
           <a href="#" className="hover:text-[#142333] transition-colors duration-200" onClick={(e) => e.preventDefault()}>Privacy</a>
           <a href="#" className="hover:text-[#142333] transition-colors duration-200" onClick={(e) => e.preventDefault()}>Terms</a>
-          <a href="#" className="hover:text-[#142333] transition-colors duration-200" onClick={(e) => e.preventDefault()}>Safety Guide</a>
           <a href="#" className="text-[#3b5974] font-medium underline underline-offset-[5px] decoration-[#cbd5e1] hover:text-[#142333] hover:decoration-[#142333] transition-all duration-200" onClick={(e) => e.preventDefault()}>Emergency Resources</a>
         </nav>
       </div>

@@ -15,7 +15,7 @@ const ReportSuccess = ({ onGoToDashboard, onViewCases }) => {
             <ShieldCheck size={32} strokeWidth={2.5} />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-            Your report has been securely saved.
+            Your report has been securely submitted.
           </h1>
           <p className="text-slate-500 text-base md:text-lg max-w-2xl leading-relaxed">
             You have taken a courageous step. Remember, you are not alone. Our platform is here to support you in the journey ahead.
