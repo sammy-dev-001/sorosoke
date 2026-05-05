@@ -16,7 +16,7 @@ import {
   Award
 } from 'lucide-react';
 
-const LandingPage = ({ onReportClick, onExploreClick }) => {
+const LandingPage = ({ onReportClick, onExploreClick, onJoinClick }) => {
   return (
     <main className="flex-grow flex flex-col items-center w-full bg-white overflow-hidden">
       {/* Hero Section */}
@@ -281,7 +281,7 @@ const LandingPage = ({ onReportClick, onExploreClick }) => {
                 File a Secure Report
               </button>
               <button 
-                onClick={onExploreClick}
+                onClick={onJoinClick}
                 className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white px-12 py-5 rounded-3xl font-bold transition-all backdrop-blur-md border border-white/10 active:scale-95 text-lg"
               >
                 Join the Community

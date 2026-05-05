@@ -11,6 +11,7 @@ const CaseDetails = () => {
   const { id } = useParams();
   const { user: currentUser } = useAuth();
   const [caseData, setCaseData] = useState(null);
+  const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,9 +22,21 @@ const CaseDetails = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await api.getCaseById(id);
-        console.log("Debug: Case Data received:", data);
-        setCaseData(data);
+        // Fetch Case Details and Complaints in parallel
+        // Note: Images are stored in Complaints, so we MUST fetch both
+        const [caseRes, complaintsRes] = await Promise.all([
+          api.getCaseById(id),
+          api.getComplaintsByCase(id).catch(err => {
+            console.warn("Complaints fetch failed, possibly no complaints yet:", err);
+            return [];
+          })
+        ]);
+        
+        console.log("Debug: Case Data:", caseRes);
+        console.log("Debug: Complaints Data:", complaintsRes);
+        
+        setCaseData(caseRes);
+        setComplaints(Array.isArray(complaintsRes) ? complaintsRes : (complaintsRes.data || []));
         setError(null);
       } catch (err) {
         console.error("Failed to fetch case details:", err);
@@ -68,24 +81,35 @@ const CaseDetails = () => {
     'other': 'Other'
   };
 
-  // Thoroughly check for evidence
+  // Helper to extract evidence from any object or array
   const extractEvidence = (data) => {
+    if (!data) return [];
     const fields = ['evidenceFiles', 'evidence', 'files', 'attachments', 'images', 'media', 'photos'];
     let foundFiles = [];
-    fields.forEach(field => {
-      const val = data[field];
-      if (Array.isArray(val)) {
-        val.forEach(item => {
-          if (typeof item === 'string') foundFiles.push(item);
-          else if (item && item.url) foundFiles.push(item.url);
-          else if (item && item.path) foundFiles.push(item.path);
-        });
-      }
-    });
-    return [...new Set(foundFiles)];
+    
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        foundFiles = [...foundFiles, ...extractEvidence(item)];
+      });
+    } else if (typeof data === 'object') {
+      fields.forEach(field => {
+        const val = data[field];
+        if (Array.isArray(val)) {
+          val.forEach(item => {
+            if (typeof item === 'string') foundFiles.push(item);
+            else if (item && item.url) foundFiles.push(item.url);
+            else if (item && item.path) foundFiles.push(item.path);
+          });
+        }
+      });
+    }
+    return foundFiles;
   };
 
-  const allEvidence = extractEvidence(caseData);
+  // Combine evidence from the main Case AND all sub-complaints
+  const caseEvidence = extractEvidence(caseData);
+  const complaintsEvidence = extractEvidence(complaints);
+  const allEvidence = [...new Set([...caseEvidence, ...complaintsEvidence])];
 
   const formatImageUrl = (url) => {
     if (!url) return '';
@@ -93,19 +117,13 @@ const CaseDetails = () => {
     return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
-  // Logic to show reporter name: 
-  // 1. Check if the case is anonymous
-  // 2. If not, check author fields in caseData
-  // 3. Fallback to currentUser if they are the author (ID check)
-  // 4. Finally fallback to "Verified Reporter"
-  const isAuthor = currentUser && (caseData.userId === currentUser.id || caseData.userId === currentUser._id || caseData.author?.id === currentUser.id || caseData.author?._id === currentUser._id);
-  
+  const isAuthor = currentUser && (caseData.userId === currentUser.id || caseData.userId === currentUser._id || caseData.createdBy?._id === currentUser._id || caseData.createdBy === currentUser.id);
   const reporterName = !caseData.isAnonymous ? (
     caseData.author?.name || 
     caseData.author?.fullName || 
-    caseData.author?.username || 
-    caseData.authorName || 
-    (isAuthor ? (currentUser.fullName || currentUser.name || currentUser.username) : "Verified Reporter")
+    caseData.createdBy?.fullName || 
+    caseData.createdBy?.name ||
+    (isAuthor ? (currentUser.fullName || currentUser.name) : "Verified Reporter")
   ) : null;
 
   return (
@@ -149,7 +167,7 @@ const CaseDetails = () => {
 
             {/* Progress Box */}
             <CaseProgressBox 
-              count={caseData.reportsCount || 0} 
+              count={caseData.complaintCount || caseData.reportsCount || 0} 
               progressPercent={caseData.progress || 0} 
             />
 
@@ -240,7 +258,7 @@ const CaseDetails = () => {
                 </div>
 
                 <button className="w-full border-2 border-dashed border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600 py-4 rounded-2xl font-bold text-[15px] transition-all">
-                  View all {caseData.reportsCount || caseData.experiences.length} experiences
+                  View all {caseData.complaintCount || caseData.experiences.length} experiences
                 </button>
               </div>
             )}

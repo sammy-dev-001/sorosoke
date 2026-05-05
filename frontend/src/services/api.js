@@ -76,10 +76,8 @@ export const getUserCases = async () => {
     const response = await api.get('/cases/me');
     return response.data.cases || response.data.data || response.data || [];
   } catch (error) {
-    // Graceful fallback for demo if the /me endpoint isn't ready
-    const allCases = await getCases();
-    // Return a few cases to populate the dashboard for the demo
-    return Array.isArray(allCases) ? allCases.slice(0, 3) : [];
+    console.error("Error fetching user cases:", error);
+    return [];
   }
 };
 
@@ -94,10 +92,15 @@ export const createComplaint = async (data) => {
   return response.data;
 };
 
-// GET /api/cases/:caseId/complaints
+// GET /api/complaints/:caseId (Note: Backend route is /api/complaints/:caseId)
 export const getComplaintsByCase = async (caseId) => {
-  const response = await api.get(`/cases/${caseId}/complaints`);
-  return response.data;
+  try {
+    const response = await api.get(`/complaints/${caseId}`);
+    return response.data.complaints || response.data.data || response.data || [];
+  } catch (error) {
+    console.error("Error fetching complaints for case:", error);
+    return [];
+  }
 };
 
 // ==========================================

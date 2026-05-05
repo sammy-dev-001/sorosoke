@@ -31,6 +31,15 @@ function AppContent() {
       navigate('/login', { state: { from: '/report' } });
     }
   };
+
+  const handleJoin = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/signup');
+    }
+  };
+
   const isAuthPage = 
     location.pathname === '/login' || 
     location.pathname === '/signup' || 
@@ -52,8 +61,9 @@ function AppContent() {
       {/* 1. Landing Page (Root) */}
       <Route path="/" element={
         <LandingPage 
-          onReportClick={() => navigate('/dashboard')} 
+          onReportClick={handleStartReport} 
           onExploreClick={() => navigate('/cases')} 
+          onJoinClick={handleJoin}
         />
       } />
 
