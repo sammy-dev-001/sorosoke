@@ -1,7 +1,9 @@
-import React from 'react';
-import { CheckCircle2, Clock, ArrowRight, MessageCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, Clock, ArrowRight, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 const SupportJourney = ({ step, daysWaiting, ngoName, onRetry }) => {
+  const [feedback, setFeedback] = useState(null); // 'yes' or 'no'
+
   const steps = [
     { id: 1, label: "NGO Suggested", status: "completed" },
     { id: 2, label: "Contacted NGO", status: step >= 2 ? "completed" : "pending" },
@@ -45,6 +47,34 @@ const SupportJourney = ({ step, daysWaiting, ngoName, onRetry }) => {
         ))}
       </div>
 
+      {step >= 2 && !feedback && (
+        <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 animate-fade-in">
+          <p className="text-[14px] font-bold text-slate-700 mb-4 text-center">Was this suggestion helpful?</p>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => setFeedback('yes')}
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-white hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 border border-slate-200 rounded-xl transition-all font-bold text-slate-600"
+            >
+              <ThumbsUp size={18} />
+              Yes
+            </button>
+            <button 
+              onClick={() => { setFeedback('no'); onRetry(); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 border border-slate-200 rounded-xl transition-all font-bold text-slate-600"
+            >
+              <ThumbsDown size={18} />
+              No
+            </button>
+          </div>
+        </div>
+      )}
+
+      {feedback === 'yes' && (
+        <div className="mb-8 p-4 bg-teal-50 text-teal-700 rounded-2xl border border-teal-100 text-center animate-fade-in">
+          <p className="text-[13px] font-bold">Thank you for your feedback!</p>
+        </div>
+      )}
+
       {step >= 3 && daysWaiting >= 2 && (
         <div className="animate-fade-in">
           <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
@@ -60,15 +90,6 @@ const SupportJourney = ({ step, daysWaiting, ngoName, onRetry }) => {
             <ArrowRight size={18} />
           </button>
         </div>
-      )}
-      
-      {step === 2 && (
-        <button 
-          className="w-full bg-teal-500 hover:bg-teal-400 text-white py-4 rounded-xl font-bold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl shadow-teal-500/10"
-          onClick={() => {/* This would move to step 3 */}}
-        >
-          Confirming Contact...
-        </button>
       )}
     </div>
   );

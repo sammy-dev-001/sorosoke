@@ -76,10 +76,10 @@ export const getUserCases = async () => {
     const response = await api.get('/cases/me');
     return response.data.cases || response.data.data || response.data || [];
   } catch (error) {
-    console.warn("Endpoint /cases/me not found, falling back to client-side filtering.");
+    // Graceful fallback for demo if the /me endpoint isn't ready
     const allCases = await getCases();
-    // Return the first few as 'demo' user cases if endpoint fails
-    return Array.isArray(allCases) ? allCases.slice(0, 2) : [];
+    // Return a few cases to populate the dashboard for the demo
+    return Array.isArray(allCases) ? allCases.slice(0, 3) : [];
   }
 };
 

@@ -30,7 +30,7 @@ const NGOItem = ({ name, category, description, contactType, onContacted, isCont
           I've reached out to this NGO
         </button>
       ) : (
-        <div className="w-full bg-teal-50 text-teal-700 py-3.5 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 border border-teal-100">
+        <div className="w-full bg-teal-50 text-teal-700 py-3.5 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 border border-teal-100 animate-fade-in">
           <CheckCircle2 size={18} />
           NGO Contacted
         </div>
@@ -39,11 +39,21 @@ const NGOItem = ({ name, category, description, contactType, onContacted, isCont
   );
 };
 
-const NGOSupportCard = ({ category }) => {
+const NGOSupportCard = ({ category, caseId }) => {
   const [ngos, setNgos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [contactedNgo, setContactedNgo] = useState(null);
   const [journeyStep, setJourneyStep] = useState(1);
+
+  // Persistence: Check if this case already has a contacted NGO in this session
+  useEffect(() => {
+    const saved = localStorage.getItem(`journey_${caseId}`);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setContactedNgo(parsed.ngo);
+      setJourneyStep(parsed.step);
+    }
+  }, [caseId]);
 
   useEffect(() => {
     const fetchNgos = async () => {
@@ -62,13 +72,16 @@ const NGOSupportCard = ({ category }) => {
   }, [category]);
 
   const handleContacted = (ngo) => {
+    const newState = { ngo, step: 3 };
     setContactedNgo(ngo);
-    setJourneyStep(3); // Jump to awaiting response for demo purposes
+    setJourneyStep(3);
+    localStorage.setItem(`journey_${caseId}`, JSON.stringify(newState));
   };
 
   const handleRetry = () => {
     setContactedNgo(null);
     setJourneyStep(1);
+    localStorage.removeItem(`journey_${caseId}`);
   };
 
   return (

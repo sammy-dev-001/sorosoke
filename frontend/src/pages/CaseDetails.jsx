@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Share2, Loader2, AlertCircle } from 'lucide-react';
+import { MapPin, Share2, Loader2, AlertCircle, Image as ImageIcon, FileText, User as UserIcon } from 'lucide-react';
 import CaseProgressBox from '../components/cases/CaseProgressBox';
 import ExperienceCard from '../components/cases/ExperienceCard';
 import NGOSupportCard from '../components/cases/NGOSupportCard';
 import * as api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const CaseDetails = () => {
   const { id } = useParams();
+  const { user: currentUser } = useAuth();
   const [caseData, setCaseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://sorosoke-backend-production.up.railway.app/api';
+  const IMAGE_BASE_URL = API_BASE_URL.replace('/api', '');
+
   useEffect(() => {
-    const fetchCase = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
         const data = await api.getCaseById(id);
+        console.log("Debug: Case Data received:", data);
         setCaseData(data);
         setError(null);
       } catch (err) {
@@ -27,7 +33,7 @@ const CaseDetails = () => {
       }
     };
 
-    fetchCase();
+    fetchData();
   }, [id]);
 
   if (loading) {
@@ -62,6 +68,46 @@ const CaseDetails = () => {
     'other': 'Other'
   };
 
+  // Thoroughly check for evidence
+  const extractEvidence = (data) => {
+    const fields = ['evidenceFiles', 'evidence', 'files', 'attachments', 'images', 'media', 'photos'];
+    let foundFiles = [];
+    fields.forEach(field => {
+      const val = data[field];
+      if (Array.isArray(val)) {
+        val.forEach(item => {
+          if (typeof item === 'string') foundFiles.push(item);
+          else if (item && item.url) foundFiles.push(item.url);
+          else if (item && item.path) foundFiles.push(item.path);
+        });
+      }
+    });
+    return [...new Set(foundFiles)];
+  };
+
+  const allEvidence = extractEvidence(caseData);
+
+  const formatImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
+  // Logic to show reporter name: 
+  // 1. Check if the case is anonymous
+  // 2. If not, check author fields in caseData
+  // 3. Fallback to currentUser if they are the author (ID check)
+  // 4. Finally fallback to "Verified Reporter"
+  const isAuthor = currentUser && (caseData.userId === currentUser.id || caseData.userId === currentUser._id || caseData.author?.id === currentUser.id || caseData.author?._id === currentUser._id);
+  
+  const reporterName = !caseData.isAnonymous ? (
+    caseData.author?.name || 
+    caseData.author?.fullName || 
+    caseData.author?.username || 
+    caseData.authorName || 
+    (isAuthor ? (currentUser.fullName || currentUser.name || currentUser.username) : "Verified Reporter")
+  ) : null;
+
   return (
     <main className="flex-grow flex flex-col items-center w-full bg-white">
       <div className="w-full max-w-7xl px-6 sm:px-10 py-12 mx-auto">
@@ -87,9 +133,19 @@ const CaseDetails = () => {
             </div>
 
             {/* Title */}
-            <h1 className="text-[36px] md:text-[44px] font-bold text-[#1e293b] leading-tight mb-10">
+            <h1 className="text-[36px] md:text-[44px] font-bold text-[#1e293b] leading-tight mb-6">
               {caseData.title}
             </h1>
+
+            {/* Reporter Info */}
+            {reporterName && (
+              <div className="flex items-center gap-3 mb-10 text-slate-500">
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                  <UserIcon size={16} />
+                </div>
+                <span className="text-[14px] font-medium">Reported by <span className="text-slate-900 font-bold">{reporterName}</span></span>
+              </div>
+            )}
 
             {/* Progress Box */}
             <CaseProgressBox 
@@ -127,6 +183,43 @@ const CaseDetails = () => {
               </div>
             </div>
 
+            {/* Evidence Gallery */}
+            {allEvidence.length > 0 && (
+              <div className="mb-16">
+                <h2 className="text-[22px] font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <ImageIcon size={24} className="text-[#335368]" />
+                  Evidence Gallery
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {allEvidence.map((file, index) => {
+                    const formattedUrl = formatImageUrl(file);
+                    const isImage = typeof file === 'string' && (file.match(/\.(jpeg|jpg|gif|png|webp)$/i) || file.startsWith('data:image'));
+                    
+                    return (
+                      <div key={index} className="aspect-square rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 relative group cursor-pointer">
+                        {isImage ? (
+                          <img 
+                            src={formattedUrl} 
+                            alt={`Evidence ${index + 1}`} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onError={(e) => { e.target.parentElement.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2"><FileText size="32" /><span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Broken Image</span></div>'; }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                            <FileText size={32} />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Document</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="text-white text-xs font-bold bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">View Full</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Shared Experiences */}
             {caseData.experiences && caseData.experiences.length > 0 && (
               <div>
@@ -157,7 +250,7 @@ const CaseDetails = () => {
           {/* Right Column: Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-28">
-              <NGOSupportCard category={caseData.category} />
+              <NGOSupportCard category={caseData.category} caseId={id} />
             </div>
           </div>
 
