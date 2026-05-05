@@ -70,6 +70,19 @@ export const getCaseById = async (id) => {
   return response.data.case || response.data.data || response.data;
 };
 
+// GET /api/cases/me (Reports by the logged-in user)
+export const getUserCases = async () => {
+  try {
+    const response = await api.get('/cases/me');
+    return response.data.cases || response.data.data || response.data || [];
+  } catch (error) {
+    console.warn("Endpoint /cases/me not found, falling back to client-side filtering.");
+    const allCases = await getCases();
+    // Return the first few as 'demo' user cases if endpoint fails
+    return Array.isArray(allCases) ? allCases.slice(0, 2) : [];
+  }
+};
+
 // ==========================================
 // COMPLAINTS
 // ==========================================

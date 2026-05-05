@@ -2,6 +2,69 @@
 
 @layer base {
   body {
-    @apply antialiased text-slate-800 bg-white;
+    @apply antialiased text-slate-900 bg-white;
   }
+}
+
+@theme {
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
+  --animate-fade-in-left: fade-in-left 0.3s ease-out forwards;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-in-up {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in-left {
+    from { 
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 10px rgba(20, 184, 166, 0.5); }
+    to { text-shadow: 0 0 20px rgba(20, 184, 166, 0.8); }
+  }
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #14b8a6 0%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-mesh {
+  background-image: radial-gradient(at 0% 0%, hsla(174, 84%, 41%, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, hsla(231, 48%, 48%, 0.15) 0px, transparent 50%),
+                    radial-gradient(at 100% 100%, hsla(174, 84%, 41%, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 0% 100%, hsla(231, 48%, 48%, 0.1) 0px, transparent 50%);
 }

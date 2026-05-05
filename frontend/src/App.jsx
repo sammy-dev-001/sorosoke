@@ -2,9 +2,6 @@ import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } fro
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ReportProvider } from './context/ReportContext';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import ActionCard from './components/ActionCard';
-import TrustBanner from './components/TrustBanner';
 import Footer from './components/Footer';
 import StartReport from './pages/StartReport';
 import ReportStep2 from './pages/ReportStep2';
@@ -18,6 +15,8 @@ import CaseDetails from './pages/CaseDetails';
 import AddExperience from './pages/AddExperience';
 import AddExperienceSuccess from './pages/AddExperienceSuccess';
 import Profile from './pages/Profile';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 
 function AppContent() {
@@ -42,44 +41,37 @@ function AppContent() {
   // Helper to determine active view for the Header
   const getActiveView = (path) => {
     if (path.startsWith('/cases')) return 'cases';
-    if (path === '/') return 'dashboard';
+    if (path === '/') return 'home';
+    if (path === '/dashboard') return 'dashboard';
     if (path === '/about') return 'about';
     return '';
   };
 
   const content = (
     <Routes>
+      {/* 1. Landing Page (Root) */}
       <Route path="/" element={
-        <main className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-12 pb-24 w-full">
-          <Hero />
-          <div className="mt-14 w-full max-w-[56rem] grid grid-cols-1 md:grid-cols-2 gap-6 z-10">
-            <ActionCard
-              title="Report an Incident"
-              description="Securely share your experience. Our encrypted system ensures your report reaches the right hands without compromise."
-              icon="megaphone"
-              iconBg="bg-[#fad4d2]"
-              iconColor="text-[#e85d5d]"
-               linkText="Report Now"
-              onClick={handleStartReport}
-            />
-            <ActionCard
-              title="View Cases"
-              description="See similar experiences shared by others. You are not alone."
-              icon="users"
-              iconBg="bg-slate-100"
-              iconColor="text-[#335368]"
-              linkText="View Cases"
-              onClick={() => navigate('/cases')}
-            />
-          </div>
-          <TrustBanner />
-        </main>
+        <LandingPage 
+          onReportClick={() => navigate('/dashboard')} 
+          onExploreClick={() => navigate('/cases')} 
+        />
       } />
 
-      <Route path="/about" element={
-        <About 
+      {/* 2. Dashboard (Action Center) */}
+      <Route path="/dashboard" element={
+        <Dashboard 
           onReportClick={handleStartReport} 
           onExploreClick={() => navigate('/cases')} 
+        />
+      } />
+
+      {/* 3. About Page */}
+      <Route path="/about" element={<About />} />
+
+      {/* 4. Cases Explorer */}
+      <Route path="/cases" element={
+        <CasesExplorer 
+          onReportNewCase={handleStartReport}
         />
       } />
 
@@ -130,14 +122,8 @@ function AppContent() {
 
       <Route path="/report/success" element={
         <ReportSuccess 
-          onGoToDashboard={() => navigate('/')}
+          onGoToDashboard={() => navigate('/dashboard')}
           onViewCases={() => navigate('/cases')}
-        />
-      } />
-
-      <Route path="/cases" element={
-        <CasesExplorer 
-          onReportNewCase={handleStartReport}
         />
       } />
 
@@ -171,7 +157,7 @@ function AppContent() {
         onProfileClick={() => user ? navigate('/profile') : navigate('/login')} 
         onHomeClick={() => navigate('/')} 
         onCasesClick={() => navigate('/cases')}
-        onDashboardClick={() => navigate('/')}
+        onDashboardClick={() => navigate('/dashboard')}
         onAboutClick={() => navigate('/about')}
         onLoginClick={() => navigate('/login')}
         onSignUpClick={() => navigate('/signup')}

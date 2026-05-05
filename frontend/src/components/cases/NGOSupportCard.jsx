@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Scale, ShieldCheck, Mail, Phone, Loader2 } from 'lucide-react';
+import { Scale, ShieldCheck, Mail, Phone, Loader2, CheckCircle2 } from 'lucide-react';
 import { getNGOs } from '../../services/api';
+import SupportJourney from './SupportJourney';
 
-const NGOItem = ({ name, category, description, contactType }) => {
+const NGOItem = ({ name, category, description, contactType, onContacted, isContacted }) => {
   const Icon = category.toLowerCase().includes('legal') ? Scale : ShieldCheck;
   
   return (
@@ -19,10 +20,21 @@ const NGOItem = ({ name, category, description, contactType }) => {
       <p className="text-slate-500 text-[14px] leading-relaxed mb-6">
         {description}
       </p>
-      <button className="w-full bg-[#e8f1f8] hover:bg-[#d9e8f4] text-[#335368] py-3 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 transition-colors">
-        {contactType === 'email' ? <Mail size={18} /> : <Phone size={18} />}
-        Contact NGO
-      </button>
+      
+      {!isContacted ? (
+        <button 
+          onClick={onContacted}
+          className="w-full bg-[#335368] hover:bg-[#2c485a] text-white py-3.5 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md"
+        >
+          {contactType === 'email' ? <Mail size={18} /> : <Phone size={18} />}
+          I've reached out to this NGO
+        </button>
+      ) : (
+        <div className="w-full bg-teal-50 text-teal-700 py-3.5 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 border border-teal-100">
+          <CheckCircle2 size={18} />
+          NGO Contacted
+        </div>
+      )}
     </div>
   );
 };
@@ -30,6 +42,8 @@ const NGOItem = ({ name, category, description, contactType }) => {
 const NGOSupportCard = ({ category }) => {
   const [ngos, setNgos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [contactedNgo, setContactedNgo] = useState(null);
+  const [journeyStep, setJourneyStep] = useState(1);
 
   useEffect(() => {
     const fetchNgos = async () => {
@@ -47,27 +61,58 @@ const NGOSupportCard = ({ category }) => {
     fetchNgos();
   }, [category]);
 
+  const handleContacted = (ngo) => {
+    setContactedNgo(ngo);
+    setJourneyStep(3); // Jump to awaiting response for demo purposes
+  };
+
+  const handleRetry = () => {
+    setContactedNgo(null);
+    setJourneyStep(1);
+  };
+
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
-      <h3 className="text-[22px] font-bold text-slate-900 mb-8">Get Support</h3>
-      
-      {loading ? (
-        <div className="flex justify-center py-10 text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin" />
+    <div className="flex flex-col gap-8">
+      <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
+        <h3 className="text-[22px] font-bold text-slate-900 mb-8">Recommended Support</h3>
+        
+        {loading ? (
+          <div className="flex justify-center py-10 text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
+        ) : ngos.length > 0 ? (
+          <div className="flex flex-col">
+            {ngos.slice(0, 2).map((ngo, index) => (
+              <React.Fragment key={ngo.id || ngo._id || index}>
+                <NGOItem 
+                  {...ngo} 
+                  onContacted={() => handleContacted(ngo)}
+                  isContacted={contactedNgo?.name === ngo.name}
+                />
+                {index < Math.min(ngos.length, 2) - 1 && (
+                  <hr className="my-6 border-slate-50" />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        ) : (
+          <p className="text-slate-400 text-sm text-center py-6">No support organizations found for this category.</p>
+        )}
+
+        <div className="mt-8 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+          <p className="text-[12px] text-indigo-700 font-medium leading-relaxed">
+            <strong>Pro Tip:</strong> Reaching out to multiple organizations increases your chances of a faster response.
+          </p>
         </div>
-      ) : ngos.length > 0 ? (
-        <div className="flex flex-col">
-          {ngos.map((ngo, index) => (
-            <React.Fragment key={ngo.id || ngo._id || index}>
-              <NGOItem {...ngo} />
-              {index < ngos.length - 1 && (
-                <hr className="my-2 border-slate-50" />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      ) : (
-        <p className="text-slate-400 text-sm text-center py-6">No support organizations found for this category.</p>
+      </div>
+
+      {contactedNgo && (
+        <SupportJourney 
+          step={journeyStep} 
+          daysWaiting={2} 
+          ngoName={contactedNgo.name}
+          onRetry={handleRetry}
+        />
       )}
     </div>
   );

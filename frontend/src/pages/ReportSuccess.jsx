@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Eye, Home } from 'lucide-react';
+import { ShieldCheck, Eye, Home, ArrowRight } from 'lucide-react';
 import NextStepsCard from '../components/NextStepsCard';
 import RightsCard from '../components/RightsCard';
 import PrivacyAlert from '../components/PrivacyAlert';
@@ -11,14 +11,14 @@ const ReportSuccess = ({ onGoToDashboard, onViewCases }) => {
         
         {/* Top Hero Section */}
         <div className="flex flex-col items-center text-center mb-16">
-          <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mb-8 shadow-sm">
-            <ShieldCheck size={32} strokeWidth={2.5} />
+          <div className="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 mb-8 shadow-sm">
+            <ShieldCheck size={40} strokeWidth={2.5} />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-            Your report has been securely submitted.
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight">
+            Report Securely Filed.
           </h1>
-          <p className="text-slate-500 text-base md:text-lg max-w-2xl leading-relaxed">
-            You have taken a courageous step. Remember, you are not alone. Our platform is here to support you in the journey ahead.
+          <p className="text-slate-500 text-base md:text-xl max-w-3xl leading-relaxed">
+            You have taken a courageous step. We have automatically matched your case with specialized organizations. Visit your <span className="font-bold text-slate-900">Support Journey</span> on the dashboard to begin the escalation process.
           </p>
         </div>
 
@@ -39,18 +39,18 @@ const ReportSuccess = ({ onGoToDashboard, onViewCases }) => {
           
           <div className="flex flex-wrap items-center gap-4 shrink-0">
             <button 
-              onClick={onViewCases}
-              className="bg-[#335368] hover:bg-[#2c485a] text-white px-8 py-3.5 rounded-xl font-semibold transition-all shadow-md flex items-center gap-2"
+              onClick={onGoToDashboard}
+              className="bg-slate-900 hover:bg-slate-800 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-xl active:scale-95 flex items-center gap-2"
             >
-              <Eye size={18} />
-              View Cases
+              Start Support Journey
+              <ArrowRight size={20} />
             </button>
             <button 
-              onClick={onGoToDashboard}
-              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-8 py-3.5 rounded-xl font-semibold transition-all shadow-sm flex items-center gap-2"
+              onClick={onViewCases}
+              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-10 py-4 rounded-xl font-bold transition-all shadow-sm flex items-center gap-2"
             >
-              <Home size={18} />
-              Go to Dashboard
+              <Eye size={20} />
+              View Other Cases
             </button>
           </div>
         </div>
