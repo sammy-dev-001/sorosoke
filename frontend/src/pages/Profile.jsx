@@ -54,7 +54,7 @@ const Profile = () => {
 
           <div className="pt-16 pb-8 px-8">
             <h1 className="text-2xl font-bold text-[#1e293b] mb-1">
-              {user?.name || user?.username || 'Anonymous User'}
+              {user?.fullName || user?.name || user?.username || 'Anonymous User'}
             </h1>
             <p className="text-slate-500 text-[15px] mb-8">
               Manage your personal information and preferences.

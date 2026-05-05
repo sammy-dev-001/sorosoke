@@ -33,40 +33,29 @@ export const ReportProvider = ({ children }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Create the Case
-      const caseData = {
-        title: `Report: ${reportData.category || 'General'}`,
+      // Use FormData for multipart/form-data support
+      const formData = new FormData();
+      
+      // Map reportData to the structure specified by the user
+      formData.append('description', reportData.description);
+      formData.append('category', reportData.category);
+      formData.append('incidentDate', reportData.date);
+      formData.append('location', reportData.location);
+      formData.append('isAnonymous', reportData.identity === 'anonymous');
+
+      // Append files if any
+      if (reportData.files && reportData.files.length > 0) {
+        reportData.files.forEach((file) => {
+          formData.append('evidenceFiles', file);
+        });
+      }
+
+      console.log("Submitting report with FormData:", {
         description: reportData.description,
-        isUrgent: reportData.isUrgent,
         category: reportData.category,
         incidentDate: reportData.date,
         location: reportData.location,
-        identityType: reportData.identity === 'identified' ? 'public' : reportData.identity
-      };
-
-      const caseResponse = await createCase(caseData);
-      console.log("Case creation response:", caseResponse);
-      const caseId = caseResponse.id || caseResponse._id || (caseResponse.data && (caseResponse.data.id || caseResponse.data._id)) || caseResponse.caseId || (caseResponse.case && (caseResponse.case.id || caseResponse.case._id));
-      console.log("Extracted Case ID:", caseId);
-
-      if (!caseId) {
-        console.error("Failed to retrieve explicit case ID from response. Response:", caseResponse);
-        throw new Error("Failed to retrieve case ID from response");
-      }
-
-      // 2. Handle files and Create Complaint
-      // Use FormData for multipart/form-data support
-      const formData = new FormData();
-      formData.append('caseId', caseId);
-      formData.append('content', reportData.description);
-      
-      reportData.files.forEach((file) => {
-        formData.append('evidenceFiles', file);
-      });
-
-      console.log("Submitting complaint with FormData:", {
-        caseId,
-        content: reportData.description,
+        isAnonymous: reportData.identity === 'anonymous',
         fileCount: reportData.files.length
       });
 

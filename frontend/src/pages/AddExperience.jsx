@@ -93,7 +93,8 @@ const AddExperience = () => {
       // Use FormData for multipart/form-data support
       const submitData = new FormData();
       submitData.append('caseId', id);
-      submitData.append('content', formData.story);
+      submitData.append('description', formData.story);
+      submitData.append('isAnonymous', formData.privacy === 'anonymous');
       
       formData.files.forEach((file) => {
         submitData.append('evidenceFiles', file);

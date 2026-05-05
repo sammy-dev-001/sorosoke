@@ -74,7 +74,13 @@ export const getCaseById = async (id) => {
 
 // POST /api/complaints
 export const createComplaint = async (data) => {
-  const response = await api.post('/complaints', data);
+  // If data is FormData (has files), set multipart headers so Axios includes the boundary.
+  // If no files, send plain JSON to avoid Multer crashing on an empty multipart body.
+  const isFormData = data instanceof FormData;
+  const config = isFormData
+    ? { headers: { 'Content-Type': 'multipart/form-data' } }
+    : {};
+  const response = await api.post('/complaints', data, config);
   return response.data;
 };
 
