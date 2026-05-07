@@ -60,83 +60,60 @@ const Dashboard = ({ onReportClick, onExploreClick }) => {
             ) : userCases.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                  {userCases.map((c, index) => {
-                    // Demo logic: odd cases are "Pending Action", even are "Awaiting Response"
-                    const isPendingAction = index % 2 === 0;
-                    
-                    return (
-                      <div 
-                        key={c.id || c._id || index} 
-                        className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100 flex flex-col md:flex-row gap-8 items-center hover:border-teal-100 transition-all group"
-                      >
-                        <div className="flex-grow text-center md:text-left">
-                          <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">
-                              {c.category?.replace('_', ' ') || 'Incident'}
-                            </span>
-                            <span className="text-slate-300">•</span>
-                            <span className="text-slate-400 text-[13px] font-medium">{c.location}</span>
-                          </div>
-                          <h3 className="text-[22px] font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">
-                            {c.title}
-                          </h3>
-                          
-                          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
-                            {c.status === 'document_generated' ? (
-                              <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full text-[13px] font-bold border border-indigo-100">
-                                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                                AI LEGAL DRAFT READY
-                              </div>
-                            ) : c.status === 'threshold_reached' ? (
-                              <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-[13px] font-bold border border-teal-100">
-                                <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                                ACTION THRESHOLD REACHED
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-[13px] font-bold border border-amber-100">
-                                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                                BUILDING EVIDENCE ({c.complaintCount || 0})
-                              </div>
-                            )}
-                          </div>
+                  {userCases.map((c, index) => (
+                    <div 
+                      key={c.id || c._id || index} 
+                      className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-slate-100 flex flex-col md:flex-row gap-8 items-center hover:border-teal-100 transition-all group"
+                    >
+                      <div className="flex-grow text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                          <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">
+                            {c.category?.replace('_', ' ') || 'Incident'}
+                          </span>
+                          <span className="text-slate-300">•</span>
+                          <span className="text-slate-400 text-[13px] font-medium">{c.location}</span>
                         </div>
-                        <div className="w-full md:w-auto flex flex-col gap-3">
-                          <button 
-                            onClick={() => navigate(`/cases/${c.id || c._id}`)}
-                            className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-slate-900/10 flex items-center justify-center gap-2"
-                          >
-                            {c.status === 'document_generated' ? "View Legal Draft" : "View Case"}
-                            <ExternalLink size={18} />
-                          </button>
+                        <h3 className="text-[22px] font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">
+                          {c.title}
+                        </h3>
+                        
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
+                          {c.status === 'document_generated' ? (
+                            <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full text-[13px] font-bold border border-indigo-100">
+                              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                              AI LEGAL DRAFT READY
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-[13px] font-bold border border-amber-100">
+                              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                              CASE ACTIVE
+                            </div>
+                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-                <div className="lg:col-span-1">
-                  {/* Show support journey for the most recent case */}
-                  <div className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                    <h4 className="text-[18px] font-bold text-slate-900 mb-6">Support Status</h4>
-                    <SupportJourney 
-                      step={3} 
-                      daysWaiting={2} 
-                      ngoName="Citizen Rights Initiative" 
-                      onRetry={() => navigate(`/cases/${userCases[0].id || userCases[0]._id}`)}
-                    />
-                    
-                    <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[14px] text-slate-600 leading-relaxed italic">
-                        "We guide you through the escalation process. If an organization doesn't respond, we'll help you find the next best option."
-                      </p>
+                      <div className="w-full md:w-auto flex flex-col gap-3">
+                        <button 
+                          onClick={() => navigate(`/cases/${c.id || c._id}`)}
+                          className={`w-full md:w-auto px-8 py-4 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 ${
+                            c.status === 'document_generated' 
+                            ? 'bg-indigo-600 text-white shadow-indigo-200' 
+                            : 'bg-slate-900 text-white shadow-slate-900/10'
+                          }`}
+                        >
+                          {c.status === 'document_generated' ? "View Legal Draft" : "View Case"}
+                          <ExternalLink size={18} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="mt-8 p-8 bg-slate-900 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl">
+                  ))}
+                </div>
+                
+                <div className="lg:col-span-1">
+                  <div className="p-8 bg-slate-900 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl">
                     <div className="relative z-10">
-                      <h4 className="text-[18px] font-bold mb-4">Community Pattern</h4>
-                      <div className="text-[48px] font-black text-teal-400 mb-2 leading-none">High</div>
+                      <h4 className="text-[18px] font-bold mb-4">Case Explorer</h4>
                       <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                        Similar cases have been reported by 12 others in {userCases[0]?.location || 'this region'}. 
+                        View other cases in your area to see collective patterns and join existing movements.
                       </p>
                       <button 
                         onClick={onExploreClick}

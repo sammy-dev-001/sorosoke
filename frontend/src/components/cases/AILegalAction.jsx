@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, FileText, Download, Copy, Check, AlertCircle, Loader2, Wand2 } from 'lucide-react';
+import jsPDF from 'jspdf';
 import * as api from '../../services/api';
 
 const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
@@ -38,13 +39,27 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
   };
 
   const handleDownload = () => {
-    const element = document.createElement("a");
-    const file = new Blob([caseData.legalDocument], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `Legal_Draft_${caseData.title.replace(/\s+/g, '_')}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    const doc = new jsPDF();
+    
+    // Set font
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("SỌRỌSÓKÈ LEGAL DRAFT", 105, 20, { align: "center" });
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Case ID: ${caseData.id || caseData._id}`, 20, 30);
+    doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 20, 35);
+    
+    doc.setLineWidth(0.5);
+    doc.line(20, 40, 190, 40);
+    
+    // Add content
+    doc.setFontSize(12);
+    const splitText = doc.splitTextToSize(caseData.legalDocument, 170);
+    doc.text(splitText, 20, 50);
+    
+    doc.save(`Legal_Draft_${caseData.title?.replace(/\s+/g, '_') || 'Case'}.pdf`);
   };
 
   return (
@@ -66,58 +81,40 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
         {!hasDocument ? (
           <div className="space-y-6">
             <p className="text-slate-500 text-[14px] leading-relaxed">
-              Based on the collective pattern of reports in this case, our AI can generate a formal legal draft citing relevant Nigerian laws.
+              Our AI analyzes your report and relevant Nigerian laws to generate a formal legal draft for escalation.
             </p>
             
-            {thresholdReached ? (
-              <div className="space-y-4">
-                <div className="flex items-start gap-3 p-4 bg-teal-50 rounded-2xl border border-teal-100/50">
-                  <div className="text-teal-600 mt-0.5">
-                    <Check size={18} strokeWidth={3} />
-                  </div>
-                  <p className="text-teal-700 text-[13px] font-medium">
-                    Critical mass reached! The AI has enough data to identify a pattern of abuse.
-                  </p>
-                </div>
-
-                {isAuthor ? (
-                  <button 
-                    onClick={handleGenerate}
-                    disabled={generating}
-                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all active:scale-95 hover:bg-slate-800 disabled:opacity-50 shadow-xl shadow-slate-900/10"
-                  >
-                    {generating ? (
-                      <>
-                        <Loader2 className="animate-spin" size={20} />
-                        Drafting Legal Document...
-                      </>
-                    ) : (
-                      <>
-                        <Wand2 size={20} />
-                        Generate Legal Draft
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
-                    <p className="text-slate-500 text-[13px]">
-                      Only the case author can initiate the AI legal draft.
+            <div className="space-y-4">
+              {isAuthor ? (
+                <button 
+                  onClick={handleGenerate}
+                  disabled={generating}
+                  className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all active:scale-95 hover:bg-slate-800 disabled:opacity-50 shadow-xl shadow-slate-900/10"
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Drafting Legal Document...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 size={20} />
+                      Generate Legal Draft
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
+                  <Clock size={24} className="text-slate-400 shrink-0" />
+                  <div>
+                    <p className="text-slate-600 text-[13px] font-bold mb-1">Awaiting Action</p>
+                    <p className="text-slate-500 text-[12px] leading-relaxed">
+                      Only the case reporter can initiate the AI legal drafting process.
                     </p>
                   </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
-                <AlertCircle size={24} className="text-amber-500 shrink-0" />
-                <div>
-                  <p className="text-amber-800 text-[13px] font-bold mb-1">Building Evidence</p>
-                  <p className="text-amber-700/80 text-[12px] leading-relaxed">
-                    AI drafting will be available once {caseData.threshold || 5} people have shared their experiences. 
-                    Currently: <strong>{caseData.complaintCount} / {caseData.threshold || 5}</strong>
-                  </p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
