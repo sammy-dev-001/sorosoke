@@ -3,7 +3,7 @@ import { Scale, ShieldCheck, Mail, Phone, Loader2, CheckCircle2 } from 'lucide-r
 import { getNGOs } from '../../services/api';
 import SupportJourney from './SupportJourney';
 
-const NGOItem = ({ name, category, description, contactType, onContacted, isContacted }) => {
+const NGOItem = ({ name, category, description, phone, email, onContacted, isContacted }) => {
   // Ensure category is a string for icon check
   const categoryString = Array.isArray(category) ? category.join(', ') : (category || '');
   const Icon = categoryString.toLowerCase().includes('legal') ? Scale : ShieldCheck;
@@ -22,13 +22,29 @@ const NGOItem = ({ name, category, description, contactType, onContacted, isCont
       <p className="text-slate-500 text-[14px] leading-relaxed mb-6">
         {description}
       </p>
+
+      {/* Contact Info Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        {phone && (
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <Phone size={16} className="text-slate-400" />
+            <span className="text-[13px] font-bold text-slate-700">{phone}</span>
+          </div>
+        )}
+        {email && (
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <Mail size={16} className="text-slate-400" />
+            <span className="text-[13px] font-bold text-slate-700 break-all">{email}</span>
+          </div>
+        )}
+      </div>
       
       {!isContacted ? (
         <button 
           onClick={onContacted}
           className="w-full bg-[#335368] hover:bg-[#2c485a] text-white py-3.5 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md"
         >
-          {contactType === 'email' ? <Mail size={18} /> : <Phone size={18} />}
+          <CheckCircle2 size={18} />
           I've reached out to this NGO
         </button>
       ) : (
