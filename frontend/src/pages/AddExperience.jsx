@@ -4,7 +4,7 @@ import { X, Send, UploadCloud, Mic, FileText } from 'lucide-react';
 import SelectionCard from '../components/SelectionCard';
 import DragDropZone from '../components/DragDropZone';
 import PrivacyAlert from '../components/PrivacyAlert';
-import { createComplaint } from '../services/api';
+import { createComplaint, getCaseById } from '../services/api';
 
 const AddExperience = () => {
   const { id } = useParams();
@@ -90,10 +90,15 @@ const AddExperience = () => {
     setError(null);
     
     try {
+      // Fetch the case to get its category
+      const caseData = await getCaseById(id);
+      const category = caseData?.category || 'other';
+      
       // Use FormData for multipart/form-data support
       const submitData = new FormData();
       submitData.append('caseId', id);
       submitData.append('description', formData.story);
+      submitData.append('category', category);
       submitData.append('isAnonymous', formData.privacy === 'anonymous');
       
       formData.files.forEach((file) => {
