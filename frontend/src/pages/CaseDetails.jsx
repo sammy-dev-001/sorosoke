@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Share2, Loader2, AlertCircle, Image as ImageIcon, FileText, User as UserIcon } from 'lucide-react';
+import { MapPin, Share2, Loader2, AlertCircle, Image as ImageIcon, FileText, User as UserIcon, Clock } from 'lucide-react';
 import CaseProgressBox from '../components/cases/CaseProgressBox';
 import ExperienceCard from '../components/cases/ExperienceCard';
 import NGOSupportCard from '../components/cases/NGOSupportCard';
@@ -138,6 +138,22 @@ const CaseDetails = () => {
     (isAuthor ? (currentUser.fullName || currentUser.name) : "Verified Reporter")
   ) : "Anonymous Victim";
 
+  const timeAgo = (date) => {
+    if (!date) return '';
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return Math.floor(seconds) + " seconds ago";
+  };
+
   return (
     <main className="flex-grow flex flex-col items-center w-full bg-white">
       <div className="w-full max-w-7xl px-6 sm:px-10 py-12 mx-auto">
@@ -155,6 +171,10 @@ const CaseDetails = () => {
               <div className="flex items-center gap-1.5 text-slate-400 text-[14px]">
                 <MapPin size={16} />
                 <span>{caseData.location}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-slate-400 text-[14px]">
+                <Clock size={16} />
+                <span>{timeAgo(caseData.createdAt)}</span>
               </div>
               <div className="flex items-center gap-2 bg-[#e8f5e9] text-[#2e7d32] px-3 py-1 rounded-full text-[13px] font-bold">
                 <span className="w-2 h-2 bg-[#2e7d32] rounded-full"></span>
