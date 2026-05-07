@@ -42,6 +42,7 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
     const doc = new jsPDF();
     const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - (margin * 2);
     
     // Header
     doc.setFont("helvetica", "bold");
@@ -63,21 +64,68 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
     // Body Content
     doc.setFontSize(12);
     doc.setTextColor(30, 41, 59); // slate-800
-    doc.setFont("helvetica", "normal");
     
-    const splitText = doc.splitTextToSize(caseData.legalDocument, pageWidth - (margin * 2));
-    
-    // Add text with better line height
     let yPosition = 55;
     const lineHeight = 7;
+
+    // Helper to render text with markdown-style bold support
+    const renderMarkdownLine = (text, x, y) => {
+      const parts = text.split(/(\*\*.*?\*\*)/g);
+      let currentX = x;
+
+      parts.forEach(part => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          doc.setFont("helvetica", "bold");
+          const boldText = part.slice(2, -2);
+          doc.text(boldText, currentX, y);
+          currentX += doc.getTextWidth(boldText);
+        } else {
+          doc.setFont("helvetica", "normal");
+          doc.text(part, currentX, y);
+          currentX += doc.getTextWidth(part);
+        }
+      });
+    };
+
+    // First, we need to wrap the text. 
+    // To do this correctly with bold, we use a plain version for the wrap calculation
+    const plainText = caseData.legalDocument.replace(/\*\*/g, '');
+    const lines = doc.splitTextToSize(plainText, maxWidth);
     
-    splitText.forEach(line => {
-      if (yPosition > 280) { // Page break check
-        doc.addPage();
-        yPosition = 20;
-      }
-      doc.text(line, margin, yPosition);
-      yPosition += lineHeight;
+    // Now we map back the bold markers to the wrapped lines
+    // This is tricky, so a simpler approach for legal documents:
+    // Split by actual newlines first to preserve document structure
+    const paragraphs = caseData.legalDocument.split('\n');
+    
+    paragraphs.forEach(para => {
+      // Wrap each paragraph
+      const plainPara = para.replace(/\*\*/g, '');
+      const wrappedLines = doc.splitTextToSize(plainPara, maxWidth);
+      
+      wrappedLines.forEach((line, index) => {
+        if (yPosition > 280) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        // We need to find the markdown version of this line
+        // For simplicity and accuracy in legal drafts (which usually have short lines), 
+        // we'll use a direct render if the line is short, or reconstruct bold markers.
+        // Best approach: Parse the original paragraph for bold tokens and wrap manually.
+        
+        // Simpler fallback: If the original paragraph had bold, and this line contains that text, bold it.
+        // Real-world fix: Legal drafts use bold for headings. We'll render the paragraph line by line.
+        
+        let lineWithMarkers = line;
+        // Re-insert bold markers for common legal headings if they were stripped
+        if (para.includes(`**${line}**`)) lineWithMarkers = `**${line}**`;
+        else if (para.includes(`**${line}`)) lineWithMarkers = `**${line}`;
+        else if (para.includes(`${line}**`)) lineWithMarkers = `${line}**`;
+
+        renderMarkdownLine(lineWithMarkers, margin, yPosition);
+        yPosition += lineHeight;
+      });
+      yPosition += 2; // Extra space between paragraphs
     });
     
     doc.save(`Legal_Draft_${caseData.title?.replace(/\s+/g, '_') || 'Case'}.pdf`);
