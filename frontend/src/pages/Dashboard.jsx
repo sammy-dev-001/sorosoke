@@ -82,15 +82,20 @@ const Dashboard = ({ onReportClick, onExploreClick }) => {
                           </h3>
                           
                           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-4">
-                            {isPendingAction ? (
-                              <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-[13px] font-bold border border-amber-100">
-                                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                                STEP 2: REACH OUT TO NGO
+                            {c.status === 'document_generated' ? (
+                              <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full text-[13px] font-bold border border-indigo-100">
+                                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                                AI LEGAL DRAFT READY
                               </div>
-                            ) : (
+                            ) : c.status === 'threshold_reached' ? (
                               <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 px-4 py-2 rounded-full text-[13px] font-bold border border-teal-100">
                                 <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                                STEP 3: AWAITING RESPONSE (Day 2)
+                                ACTION THRESHOLD REACHED
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-2 rounded-full text-[13px] font-bold border border-amber-100">
+                                <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                BUILDING EVIDENCE ({c.complaintCount || 0})
                               </div>
                             )}
                           </div>
@@ -100,7 +105,7 @@ const Dashboard = ({ onReportClick, onExploreClick }) => {
                             onClick={() => navigate(`/cases/${c.id || c._id}`)}
                             className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-slate-900/10 flex items-center justify-center gap-2"
                           >
-                            {isPendingAction ? "Get NGO Details" : "View Case"}
+                            {c.status === 'document_generated' ? "View Legal Draft" : "View Case"}
                             <ExternalLink size={18} />
                           </button>
                         </div>

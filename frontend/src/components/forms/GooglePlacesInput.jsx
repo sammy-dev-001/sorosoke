@@ -79,11 +79,7 @@ const GooglePlacesInput = ({ label, placeholder, value, onChange, name, id, left
           />
         )}
       </div>
-      {!isApiKeyValid && (
-        <p className="text-[11px] text-slate-400 italic">
-          * Location autocomplete is disabled (Missing API Key)
-        </p>
-      )}
+      {/* Autocomplete disabled message removed */}
     </div>
   );
 };

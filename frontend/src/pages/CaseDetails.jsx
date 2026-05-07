@@ -6,6 +6,7 @@ import ExperienceCard from '../components/cases/ExperienceCard';
 import NGOSupportCard from '../components/cases/NGOSupportCard';
 import * as api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import AILegalAction from '../components/cases/AILegalAction';
 
 const CaseDetails = () => {
   const { id } = useParams();
@@ -48,6 +49,14 @@ const CaseDetails = () => {
 
     fetchData();
   }, [id]);
+
+  const handleDocumentGenerated = (newDocument) => {
+    setCaseData(prev => ({
+      ...prev,
+      legalDocument: newDocument,
+      documentGenerated: true
+    }));
+  };
 
   if (loading) {
     return (
@@ -266,8 +275,13 @@ const CaseDetails = () => {
           </div>
 
           {/* Right Column: Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-28">
+          <div className="lg:col-span-1 flex flex-col gap-8">
+            <div className="sticky top-28 flex flex-col gap-8">
+              <AILegalAction 
+                caseData={caseData} 
+                isAuthor={isAuthor} 
+                onDocumentGenerated={handleDocumentGenerated} 
+              />
               <NGOSupportCard category={caseData.category} caseId={id} />
             </div>
           </div>

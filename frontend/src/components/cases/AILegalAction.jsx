@@ -1,0 +1,196 @@
+import React, { useState } from 'react';
+import { Sparkles, FileText, Download, Copy, Check, AlertCircle, Loader2, Wand2 } from 'lucide-react';
+import * as api from '../../services/api';
+
+const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [showFullDoc, setShowFullDoc] = useState(false);
+
+  const hasDocument = caseData.documentGenerated || caseData.legalDocument;
+  const thresholdReached = caseData.complaintCount >= (caseData.threshold || 5);
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setError(null);
+    try {
+      const result = await api.generateDocument(caseData.id || caseData._id);
+      if (result.success) {
+        onDocumentGenerated(result.data);
+      } else {
+        setError(result.message || "Failed to generate document.");
+      }
+    } catch (err) {
+      console.error("AI Generation Error:", err);
+      setError(err.response?.data?.message || "Something went wrong with the AI service.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (caseData.legalDocument) {
+      navigator.clipboard.writeText(caseData.legalDocument);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleDownload = () => {
+    const element = document.createElement("a");
+    const file = new Blob([caseData.legalDocument], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = `Legal_Draft_${caseData.title.replace(/\s+/g, '_')}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  return (
+    <div className="bg-white rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden relative">
+      {/* Decorative Gradient Background */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/10 to-teal-500/10 blur-3xl -z-0"></div>
+      
+      <div className="relative z-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+            <Sparkles size={20} />
+          </div>
+          <div>
+            <h3 className="text-[18px] font-bold text-slate-900 leading-tight">AI Legal Assistance</h3>
+            <p className="text-[12px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">Powered by Llama 3.3</p>
+          </div>
+        </div>
+
+        {!hasDocument ? (
+          <div className="space-y-6">
+            <p className="text-slate-500 text-[14px] leading-relaxed">
+              Based on the collective pattern of reports in this case, our AI can generate a formal legal draft citing relevant Nigerian laws.
+            </p>
+            
+            {thresholdReached ? (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 p-4 bg-teal-50 rounded-2xl border border-teal-100/50">
+                  <div className="text-teal-600 mt-0.5">
+                    <Check size={18} strokeWidth={3} />
+                  </div>
+                  <p className="text-teal-700 text-[13px] font-medium">
+                    Critical mass reached! The AI has enough data to identify a pattern of abuse.
+                  </p>
+                </div>
+
+                {isAuthor ? (
+                  <button 
+                    onClick={handleGenerate}
+                    disabled={generating}
+                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-[15px] flex items-center justify-center gap-3 transition-all active:scale-95 hover:bg-slate-800 disabled:opacity-50 shadow-xl shadow-slate-900/10"
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="animate-spin" size={20} />
+                        Drafting Legal Document...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 size={20} />
+                        Generate Legal Draft
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                    <p className="text-slate-500 text-[13px]">
+                      Only the case author can initiate the AI legal draft.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-5 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-4">
+                <AlertCircle size={24} className="text-amber-500 shrink-0" />
+                <div>
+                  <p className="text-amber-800 text-[13px] font-bold mb-1">Building Evidence</p>
+                  <p className="text-amber-700/80 text-[12px] leading-relaxed">
+                    AI drafting will be available once {caseData.threshold || 5} people have shared their experiences. 
+                    Currently: <strong>{caseData.complaintCount} / {caseData.threshold || 5}</strong>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+              <FileText size={24} className="text-indigo-600 shrink-0" />
+              <div>
+                <p className="text-indigo-900 text-[14px] font-bold">Draft Document Ready</p>
+                <p className="text-indigo-700/70 text-[12px]">Legal citations and demands prepared.</p>
+              </div>
+            </div>
+
+            <div className={`relative bg-slate-50 rounded-2xl p-5 border border-slate-100 overflow-hidden transition-all duration-500 ${showFullDoc ? 'max-h-[1000px]' : 'max-h-[160px]'}`}>
+              <pre className="text-[13px] text-slate-600 font-mono whitespace-pre-wrap leading-relaxed">
+                {caseData.legalDocument}
+              </pre>
+              {!showFullDoc && (
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-50 to-transparent flex items-end justify-center pb-4">
+                  <button 
+                    onClick={() => setShowFullDoc(true)}
+                    className="text-indigo-600 font-bold text-[13px] hover:underline"
+                  >
+                    Read Full Draft
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button 
+                onClick={handleDownload}
+                className="flex-1 bg-slate-900 text-white py-3.5 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-900/5"
+              >
+                <Download size={16} />
+                Download
+              </button>
+              <button 
+                onClick={handleCopy}
+                className="flex-1 border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 hover:bg-slate-50 transition-all active:scale-95"
+              >
+                {copied ? (
+                  <>
+                    <Check size={16} className="text-teal-600" />
+                    <span className="text-teal-600">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={16} />
+                    Copy Text
+                  </>
+                )}
+              </button>
+            </div>
+            
+            {showFullDoc && (
+              <button 
+                onClick={() => setShowFullDoc(false)}
+                className="w-full text-slate-400 font-medium text-[12px] hover:text-slate-600"
+              >
+                Show Less
+              </button>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600">
+            <AlertCircle size={16} />
+            <p className="text-[12px] font-medium">{error}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AILegalAction;
