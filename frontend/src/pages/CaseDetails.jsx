@@ -177,11 +177,7 @@ const CaseDetails = () => {
               </div>
             )}
 
-            {/* Progress Box */}
-            <CaseProgressBox 
-              count={caseData.complaintCount || caseData.reportsCount || 0} 
-              progressPercent={caseData.progress || 0} 
-            />
+
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-4 mb-14">
