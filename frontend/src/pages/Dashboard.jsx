@@ -121,7 +121,7 @@ const Dashboard = ({ onReportClick, onExploreClick }) => {
                       step={3} 
                       daysWaiting={2} 
                       ngoName="Citizen Rights Initiative" 
-                      onRetry={() => navigate('/cases')}
+                      onRetry={() => navigate(`/cases/${userCases[0].id || userCases[0]._id}`)}
                     />
                     
                     <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-100">
