@@ -24,17 +24,21 @@ const NGOItem = ({ name, category, description, phone, email, onContacted, isCon
       </p>
 
       {/* Contact Info Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="flex flex-col gap-3 mb-6">
         {phone && (
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-            <Phone size={16} className="text-slate-400" />
-            <span className="text-[13px] font-bold text-slate-700">{phone}</span>
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 group/phone">
+            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 group-hover/phone:text-indigo-500 transition-colors">
+              <Phone size={14} />
+            </div>
+            <span className="text-[13px] font-bold text-slate-700 whitespace-nowrap">{phone}</span>
           </div>
         )}
         {email && (
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-            <Mail size={16} className="text-slate-400" />
-            <span className="text-[13px] font-bold text-slate-700 break-all">{email}</span>
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 group/email">
+            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-400 group-hover/email:text-indigo-500 transition-colors">
+              <Mail size={14} />
+            </div>
+            <span className="text-[13px] font-bold text-slate-700 truncate">{email}</span>
           </div>
         )}
       </div>
