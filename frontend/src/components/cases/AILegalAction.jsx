@@ -47,7 +47,7 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
     doc.setTextColor(15, 23, 42); // slate-900
-    doc.text("SỌRỌSÓKÈ LEGAL DRAFT", pageWidth / 2, 25, { align: "center" });
+    doc.text("SOROSOKE LEGAL DRAFT", pageWidth / 2, 25, { align: "center" });
     
     // Sub-header / Date
     doc.setFontSize(10);
