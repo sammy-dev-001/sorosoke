@@ -4,7 +4,9 @@ import { getNGOs } from '../../services/api';
 import SupportJourney from './SupportJourney';
 
 const NGOItem = ({ name, category, description, contactType, onContacted, isContacted }) => {
-  const Icon = category.toLowerCase().includes('legal') ? Scale : ShieldCheck;
+  // Ensure category is a string for icon check
+  const categoryString = Array.isArray(category) ? category.join(', ') : (category || '');
+  const Icon = categoryString.toLowerCase().includes('legal') ? Scale : ShieldCheck;
   
   return (
     <div className="py-6 first:pt-0 last:pb-0">
@@ -14,7 +16,7 @@ const NGOItem = ({ name, category, description, contactType, onContacted, isCont
         </div>
         <div>
           <h4 className="font-bold text-slate-800 text-[16px] mb-0.5">{name}</h4>
-          <p className="text-[#64748b] text-[13px] font-medium">{category}</p>
+          <p className="text-[#64748b] text-[13px] font-medium">{categoryString.replace(/_/g, ' ')}</p>
         </div>
       </div>
       <p className="text-slate-500 text-[14px] leading-relaxed mb-6">

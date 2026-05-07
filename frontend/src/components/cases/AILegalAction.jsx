@@ -40,24 +40,45 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
 
   const handleDownload = () => {
     const doc = new jsPDF();
+    const margin = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
     
-    // Set font
+    // Header
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.text("SỌRỌSÓKÈ LEGAL DRAFT", 105, 20, { align: "center" });
+    doc.setFontSize(22);
+    doc.setTextColor(15, 23, 42); // slate-900
+    doc.text("SỌRỌSÓKÈ LEGAL DRAFT", pageWidth / 2, 25, { align: "center" });
     
+    // Sub-header / Date
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Case ID: ${caseData.id || caseData._id}`, 20, 30);
-    doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 20, 35);
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text(`DATE GENERATED: ${new Date().toLocaleDateString().toUpperCase()}`, margin, 35);
     
+    // Divider
+    doc.setDrawColor(226, 232, 240); // slate-200
     doc.setLineWidth(0.5);
-    doc.line(20, 40, 190, 40);
+    doc.line(margin, 40, pageWidth - margin, 40);
     
-    // Add content
+    // Body Content
     doc.setFontSize(12);
-    const splitText = doc.splitTextToSize(caseData.legalDocument, 170);
-    doc.text(splitText, 20, 50);
+    doc.setTextColor(30, 41, 59); // slate-800
+    doc.setFont("helvetica", "normal");
+    
+    const splitText = doc.splitTextToSize(caseData.legalDocument, pageWidth - (margin * 2));
+    
+    // Add text with better line height
+    let yPosition = 55;
+    const lineHeight = 7;
+    
+    splitText.forEach(line => {
+      if (yPosition > 280) { // Page break check
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(line, margin, yPosition);
+      yPosition += lineHeight;
+    });
     
     doc.save(`Legal_Draft_${caseData.title?.replace(/\s+/g, '_') || 'Case'}.pdf`);
   };

@@ -113,7 +113,7 @@ export const getNGOs = async (category) => {
   if (category && category !== 'All Categories') params.category = category;
   
   const response = await api.get('/ngos', { params });
-  return response.data;
+  return response.data.data || response.data;
 };
 
 // ==========================================
