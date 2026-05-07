@@ -126,7 +126,10 @@ const CaseDetails = () => {
     return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
-  const isAuthor = currentUser && (caseData.userId === currentUser.id || caseData.userId === currentUser._id || caseData.createdBy?._id === currentUser._id || caseData.createdBy === currentUser.id);
+  const currentUserId = currentUser?._id || currentUser?.id;
+  const caseCreatorId = caseData.createdBy?._id || caseData.createdBy || caseData.userId;
+  
+  const isAuthor = currentUserId && caseCreatorId && (currentUserId.toString() === caseCreatorId.toString());
   const reporterName = !caseData.isAnonymous ? (
     caseData.author?.name || 
     caseData.author?.fullName || 
