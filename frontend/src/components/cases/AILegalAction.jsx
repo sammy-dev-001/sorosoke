@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { Sparkles, FileText, Download, Copy, Check, AlertCircle, Loader2, Wand2 } from 'lucide-react';
+import { Sparkles, FileText, Download, Copy, Check, AlertCircle, Loader2, Wand2, Clock } from 'lucide-react';
 import jsPDF from 'jspdf';
 import * as api from '../../services/api';
 
-const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
+const AILegalAction = ({ caseData, isAuthor, evidence = [], onDocumentGenerated }) => {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [showFullDoc, setShowFullDoc] = useState(false);
 
   const hasDocument = caseData.documentGenerated || caseData.legalDocument;
-  const thresholdReached = caseData.complaintCount >= (caseData.threshold || 5);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -38,7 +37,7 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const doc = new jsPDF();
     const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -87,37 +86,19 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
       });
     };
 
-    // First, we need to wrap the text. 
-    // To do this correctly with bold, we use a plain version for the wrap calculation
-    const plainText = caseData.legalDocument.replace(/\*\*/g, '');
-    const lines = doc.splitTextToSize(plainText, maxWidth);
-    
-    // Now we map back the bold markers to the wrapped lines
-    // This is tricky, so a simpler approach for legal documents:
-    // Split by actual newlines first to preserve document structure
     const paragraphs = caseData.legalDocument.split('\n');
     
     paragraphs.forEach(para => {
-      // Wrap each paragraph
       const plainPara = para.replace(/\*\*/g, '');
       const wrappedLines = doc.splitTextToSize(plainPara, maxWidth);
       
-      wrappedLines.forEach((line, index) => {
-        if (yPosition > 280) {
+      wrappedLines.forEach((line) => {
+        if (yPosition > 270) {
           doc.addPage();
           yPosition = 20;
         }
-
-        // We need to find the markdown version of this line
-        // For simplicity and accuracy in legal drafts (which usually have short lines), 
-        // we'll use a direct render if the line is short, or reconstruct bold markers.
-        // Best approach: Parse the original paragraph for bold tokens and wrap manually.
-        
-        // Simpler fallback: If the original paragraph had bold, and this line contains that text, bold it.
-        // Real-world fix: Legal drafts use bold for headings. We'll render the paragraph line by line.
         
         let lineWithMarkers = line;
-        // Re-insert bold markers for common legal headings if they were stripped
         if (para.includes(`**${line}**`)) lineWithMarkers = `**${line}**`;
         else if (para.includes(`**${line}`)) lineWithMarkers = `**${line}`;
         else if (para.includes(`${line}**`)) lineWithMarkers = `${line}**`;
@@ -125,8 +106,48 @@ const AILegalAction = ({ caseData, isAuthor, onDocumentGenerated }) => {
         renderMarkdownLine(lineWithMarkers, margin, yPosition);
         yPosition += lineHeight;
       });
-      yPosition += 2; // Extra space between paragraphs
+      yPosition += 2;
     });
+
+    // Evidence Section
+    if (evidence && evidence.length > 0) {
+      doc.addPage();
+      yPosition = 30;
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("ATTACHED EVIDENCE", margin, yPosition);
+      
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin, yPosition + 5, pageWidth - margin, yPosition + 5);
+      
+      yPosition += 20;
+
+      // Filter for images only
+      const images = evidence.filter(e => 
+        typeof e === 'string' && (e.match(/\.(jpeg|jpg|gif|png|webp)$/i) || e.startsWith('data:image'))
+      );
+
+      for (const imgUrl of images) {
+        if (yPosition > 220) {
+          doc.addPage();
+          yPosition = 30;
+        }
+
+        try {
+          // In a real environment, we'd want to handle image loading properly
+          // For now, we add the image if possible
+          const imgProps = doc.getImageProperties(imgUrl);
+          const imgWidth = maxWidth;
+          const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+          
+          doc.addImage(imgUrl, 'JPEG', margin, yPosition, imgWidth, imgHeight);
+          yPosition += imgHeight + 10;
+        } catch (e) {
+          console.warn("Could not add image to PDF:", imgUrl);
+        }
+      }
+    }
     
     doc.save(`Legal_Draft_${caseData.title?.replace(/\s+/g, '_') || 'Case'}.pdf`);
   };

@@ -61,7 +61,7 @@ const NGOItem = ({ name, category, description, phone, email, onContacted, isCon
   );
 };
 
-const NGOSupportCard = ({ category, caseId }) => {
+const NGOSupportCard = ({ category, caseId, isAuthor }) => {
   const [ngos, setNgos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [contactedNgo, setContactedNgo] = useState(null);
@@ -94,6 +94,7 @@ const NGOSupportCard = ({ category, caseId }) => {
   }, [category]);
 
   const handleContacted = (ngo) => {
+    if (!isAuthor) return; // Guard clause
     const newState = { ngo, step: 3 };
     setContactedNgo(ngo);
     setJourneyStep(3);
@@ -101,6 +102,7 @@ const NGOSupportCard = ({ category, caseId }) => {
   };
 
   const handleRetry = () => {
+    if (!isAuthor) return; // Guard clause
     setContactedNgo(null);
     setJourneyStep(1);
     localStorage.removeItem(`journey_${caseId}`);
@@ -108,7 +110,20 @@ const NGOSupportCard = ({ category, caseId }) => {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50">
+      <div className="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-50 relative overflow-hidden">
+        {/* Overlay for non-authors */}
+        {!isAuthor && (
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center p-8 text-center">
+            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-4">
+              <ShieldCheck size={24} />
+            </div>
+            <h4 className="font-bold text-slate-900 text-[16px] mb-2">Support Access Restricted</h4>
+            <p className="text-slate-500 text-[13px] leading-relaxed">
+              Only the original case reporter can initiate contact with support organizations.
+            </p>
+          </div>
+        )}
+
         <h3 className="text-[22px] font-bold text-slate-900 mb-8">Recommended Support</h3>
         
         {loading ? (

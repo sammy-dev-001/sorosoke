@@ -133,7 +133,7 @@ const CaseDetails = () => {
     caseData.createdBy?.fullName || 
     caseData.createdBy?.name ||
     (isAuthor ? (currentUser.fullName || currentUser.name) : "Verified Reporter")
-  ) : null;
+  ) : "Anonymous Victim";
 
   return (
     <main className="flex-grow flex flex-col items-center w-full bg-white">
@@ -280,9 +280,14 @@ const CaseDetails = () => {
               <AILegalAction 
                 caseData={caseData} 
                 isAuthor={isAuthor} 
+                evidence={allEvidence}
                 onDocumentGenerated={handleDocumentGenerated} 
               />
-              <NGOSupportCard category={caseData.category} caseId={id} />
+              <NGOSupportCard 
+                category={caseData.category} 
+                caseId={id} 
+                isAuthor={isAuthor}
+              />
             </div>
           </div>
 
